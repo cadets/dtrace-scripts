@@ -12,6 +12,7 @@ syscall::open*:entry
 	    walltimestamp, copyinstr(arg0), pid, uid, execname);
 }
 
+/* Temporarily disabled since FreeBSD does not support fi_pathname
 
 syscall::read*:entry,syscall::write*:entry
 /pid != $pid/
@@ -19,6 +20,8 @@ syscall::read*:entry,syscall::write*:entry
 	printf("At %Y %s file %s by %s\n",
 	    walltimestamp, fds[arg0].fi_pathname, probefunc, execname);
 }
+
+*/
 
 proc:::exec-success
 /pid != $pid/
