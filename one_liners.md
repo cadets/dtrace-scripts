@@ -115,3 +115,9 @@ sudo dtrace -n 'pid1:::entry { @a[probemod,probefunc] = count(); } END { trunc(@
   libsystem_c.dylib                                   strlen                                                          478
   libsystem_platform.dylib                            _platform_strcmp                                                596
 ~~~
+
+List probes:
+
+~~~
+dtrace -ln 'pid$target:::entry' -p
+~~~
