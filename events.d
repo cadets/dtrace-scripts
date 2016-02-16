@@ -12,26 +12,41 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 syscall::open:entry
 /pid != $pid/
 {
-	printf("{\"event\": \"%s\", \"time\": %d, \"pid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\"}\n",
-	    probefunc, walltimestamp, pid, uid, execname, copyinstr(arg0));
+	printf("{\"event\": \"%s:%s\", \"time\": %d, \"pid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\"}\n",
+	    probefunc, probename, walltimestamp, pid, uid, execname, copyinstr(arg0));
+}
+
+syscall::open:return
+/pid != $pid/
+{
+	printf("{\"event\": \"%s:%s\", \"time\": %d, \"pid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": \"%d\"}\n",
+	    probefunc, probename, walltimestamp, pid, uid, execname, arg0);
 }
 
 syscall::openat:entry
 /pid != $pid/
 {
-	printf("{\"event\": \"%s\", \"time\": %d, \"pid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\"}\n",
-	    probefunc, walltimestamp, pid, uid, execname, copyinstr(arg1));
+	printf("{\"event\": \"%s:%s\", \"time\": %d, \"pid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\"}\n",
+	    probefunc, probename, walltimestamp, pid, uid, execname, copyinstr(arg1));
+}
+
+syscall::openat:return
+/pid != $pid/
+{
+	printf("{\"event\": \"%s:%s\", \"time\": %d, \"pid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": \"%d\"}\n",
+	    probefunc, probename, walltimestamp, pid, uid, execname, arg0);
 }
 
 /* TODO: Add support for fds[arg0].fi_pathname */
 syscall::read:entry,syscall::write:entry,
 syscall::pread:entry,syscall::pwrite:entry,
 syscall::readv:entry,syscall::writev:entry,
-syscall::pread:entry,syscall::pwrite:entry
+syscall::pread:entry,syscall::pwrite:entry,
+syscall::preadv:entry,syscall::pwritev:entry
 /pid != $pid && execname != "sshd" && execname != "tmux"/
 {
-	printf("{\"event\": \"%s\", \"time\": %d, \"pid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"TODO\"}\n",
-	    probefunc, walltimestamp, pid, uid, execname);
+	printf("{\"event\": \"%s\", \"time\": %d, \"pid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d}\n",
+	    probefunc, walltimestamp, pid, uid, execname, arg0);
 }
 
 syscall::execve:entry
