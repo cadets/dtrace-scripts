@@ -21,32 +21,32 @@ END {
 syscall::open:entry
 /pid != $pid/
 {
-	printf("%s {\"event\": \"%s:%s\", \"time\": %d, \"pid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\"}\n",
-	    comma, probefunc, probename, walltimestamp, pid, uid, execname, copyinstr(arg0));
+	printf("%s {\"event\": \"%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\"}\n",
+	    comma, probefunc, probename, walltimestamp, pid, tid, uid, execname, copyinstr(arg0));
 	comma=",";
 }
 
 syscall::open:return
 /pid != $pid/
 {
-	printf("%s {\"event\": \"%s:%s\", \"time\": %d, \"pid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": \"%d\"}\n",
-	    comma, probefunc, probename, walltimestamp, pid, uid, execname, arg0);
+	printf("%s {\"event\": \"%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": \"%d\"}\n",
+	    comma, probefunc, probename, walltimestamp, pid, tid, uid, execname, arg0);
 	comma=",";
 }
 
 syscall::openat:entry
 /pid != $pid/
 {
-	printf("%s {\"event\": \"%s:%s\", \"time\": %d, \"pid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\"}\n",
-	    comma, probefunc, probename, walltimestamp, pid, uid, execname, copyinstr(arg1));
+	printf("%s {\"event\": \"%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\"}\n",
+	    comma, probefunc, probename, walltimestamp, pid, tid, uid, execname, copyinstr(arg1));
 	comma=",";
 }
 
 syscall::openat:return
 /pid != $pid/
 {
-	printf("%s {\"event\": \"%s:%s\", \"time\": %d, \"pid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": \"%d\"}\n",
-	    comma, probefunc, probename, walltimestamp, pid, uid, execname, arg0);
+	printf("%s {\"event\": \"%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": \"%d\"}\n",
+	    comma, probefunc, probename, walltimestamp, pid, tid, uid, execname, arg0);
 	comma=",";
 }
 
@@ -58,16 +58,16 @@ syscall::pread:entry,syscall::pwrite:entry,
 syscall::preadv:entry,syscall::pwritev:entry
 /pid != $pid && execname != "sshd" && execname != "tmux"/
 {
-	printf("%s {\"event\": \"%s\", \"time\": %d, \"pid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d}\n",
-	    comma, probefunc, walltimestamp, pid, uid, execname, arg0);
+	printf("%s {\"event\": \"%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d}\n",
+	    comma, probefunc, walltimestamp, pid, tid, uid, execname, arg0);
 	comma=",";
 }
 
 syscall::execve:entry
 /pid != $pid/
 {
-	printf("%s {\"event\": \"%s\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"uid\": %d, \"exec\": \"%s\"}\n",
-	    comma, probefunc, walltimestamp, pid, curpsinfo->pr_ppid, uid, copyinstr(arg0));
+	printf("%s {\"event\": \"%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"ppid\": %d, \"uid\": %d, \"exec\": \"%s\"}\n",
+	    comma, probefunc, walltimestamp, pid, tid, curpsinfo->pr_ppid, uid, copyinstr(arg0));
 	comma=",";
 }
 
@@ -75,16 +75,16 @@ syscall::execve:entry
 syscall::fork:entry,syscall::rfork:entry,syscall::vfork:entry
 /pid != $pid/
 {
-	printf("%s {\"event\": \"%s\", \"time\": %d, \"pid\": %d, \"uid\": %d, \"exec\": \"%s\"}\n",
-	    comma, probefunc, walltimestamp, pid, uid, execname);
+	printf("%s {\"event\": \"%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\"}\n",
+	    comma, probefunc, walltimestamp, pid, tid, uid, execname);
 	comma=",";
 }
 
 syscall::exit:entry
 /pid != $pid/
 {
-	printf("%s {\"event\": \"%s\", \"time\": %d, \"pid\": %d, \"uid\": %d, \"exec\": \"%s\"}\n",
-	    comma, probefunc, walltimestamp, pid, uid, execname);
+	printf("%s {\"event\": \"%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\"}\n",
+	    comma, probefunc, walltimestamp, pid, tid, uid, execname);
 	comma=",";
 }
 
@@ -120,8 +120,8 @@ syscall::connect*:return
 /self->start/
 {
 	this->delta = (timestamp - self->start) / 1000;
-	printf("%s {\"event\": \"%s\", \"time\": %d, \"pid\": %d, \"uid\": %d, \"exec\": \"%s\", \"family\": %d, \"address\": \"%s\", \"port\": %d, \"err\": %d}\n",
-	    comma, probefunc, walltimestamp, pid, uid, execname, self->family, self->address, self->port, errno);
+	printf("%s {\"event\": \"%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"family\": %d, \"address\": \"%s\", \"port\": %d, \"err\": %d}\n",
+	    comma, probefunc, walltimestamp, pid, tid, uid, execname, self->family, self->address, self->port, errno);
 	comma=",";
 	self->family = 0;
 	self->address = 0;
@@ -150,8 +150,8 @@ syscall::accept*:return
 {
 	this->port = ntohs(this->s->sin_port);
 	this->address = inet_ntoa((in_addr_t *)&this->s->sin_addr);
-	printf("%s {\"event\": \"%s\", \"time\": %d, \"pid\": %d, \"uid\": %d, \"exec\": \"%s\", \"family\": %d, \"address\": \"%s\", \"port\": %d, \"err\": %d}\n",
-	    comma, probefunc, walltimestamp, pid, uid, execname, this->f, this->address, this->port, errno);
+	printf("%s {\"event\": \"%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"family\": %d, \"address\": \"%s\", \"port\": %d, \"err\": %d}\n",
+	    comma, probefunc, walltimestamp, pid, tid, uid, execname, this->f, this->address, this->port, errno);
 	comma=",";
 }
 
@@ -163,8 +163,8 @@ syscall::accept*:return
 	    sizeof (struct sockaddr_in6));
 	this->port = ntohs(this->s6->sin6_port);
 	this->address = inet_ntoa6((in6_addr_t *)&this->s6->sin6_addr);
-	printf("%s {\"event\": \"%s\", \"time\": %d, \"pid\": %d, \"uid\": %d, \"exec\": \"%s\", \"family\": %d, \"address\": \"%s\", \"port\": %d, \"err\": %d}\n",
-	    comma, probefunc, walltimestamp, pid, uid, execname, this->f, this->address, this->port, errno);
+	printf("%s {\"event\": \"%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"family\": %d, \"address\": \"%s\", \"port\": %d, \"err\": %d}\n",
+	    comma, probefunc, walltimestamp, pid, tid, uid, execname, this->f, this->address, this->port, errno);
 	comma=",";
 }
 
