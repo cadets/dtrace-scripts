@@ -1,3 +1,0 @@
-#!/usr/bin/awk -f
-
-NF && NR == 1 { printf("  ") } NF && NR > 1 { printf(", ") } NF { printf("%s\n", $0)} BEGIN {printf("[\n")} END {printf("]\n")}
