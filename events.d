@@ -11,7 +11,7 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 
 BEGIN {
 	printf("[\n");
-	comma="";
+	comma=" ";
 }
 
 END {
@@ -29,7 +29,7 @@ syscall::open:entry
 syscall::open:return
 /pid != $pid/
 {
-	printf("%s {\"event\": \"%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": \"%d\"}\n",
+	printf("%s {\"event\": \"%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d}\n",
 	    comma, probefunc, probename, walltimestamp, pid, tid, uid, execname, arg0);
 	comma=",";
 }
@@ -45,7 +45,31 @@ syscall::openat:entry
 syscall::openat:return
 /pid != $pid/
 {
-	printf("%s {\"event\": \"%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": \"%d\"}\n",
+	printf("%s {\"event\": \"%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d}\n",
+	    comma, probefunc, probename, walltimestamp, pid, tid, uid, execname, arg0);
+	comma=",";
+}
+
+syscall::close:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d}\n",
+	    comma, probefunc, walltimestamp, pid, tid, uid, execname, arg0);
+	comma=",";
+}
+
+syscall::dup*:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d}\n",
+	    comma, probefunc, probename, walltimestamp, pid, tid, uid, execname, arg0);
+	comma=",";
+}
+
+syscall::dup*:return
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d}\n",
 	    comma, probefunc, probename, walltimestamp, pid, tid, uid, execname, arg0);
 	comma=",";
 }
