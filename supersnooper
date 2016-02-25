@@ -42,24 +42,30 @@
 # Command line and argument passing
 
 # The DTrace Bits
-/usr/sbin/dtrace -n '
+/usr/sbin/dtrace -q -n '
 #pragma D option oformat=xml
 syscall::execve:return
 /pid != $pid && execname != "sshd"/
 {
+    printf("<exec>\n");
 	printf("%m %d %m %s", "uid", uid, "program", execname);
+    printf("</exec>\n");
 }
 syscall::*read:entry,
 syscall::*write:entry
 /pid != $pid && execname != "sshd"/
 {
+    printf("<exec>\n");
 	printf("%m %d %m %s %m %d %m %d", "uid", uid, "program", execname,
 	       "fd", arg0, "len", arg2);
+    printf("</exec>\n");
 }
 syscall::open:entry
 /pid != $pid && execname != "sshd"/
 {
+    printf("<exec>\n");
 	printf("%m %d %m %s %m %s", "uid", uid, "program", execname, 
 		"file", copyinstr(arg0));
+    printf("</exec>\n");
 }
 '
