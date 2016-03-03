@@ -20,15 +20,16 @@ END {
 
 postgresql$target:::transaction*
 {
-	printf("%s {\"event\": \"%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"id\": \"%s\"}\n",
-	    comma, probefunc, probename, walltimestamp, pid, tid, uid, execname, copyinstr(arg0));
+    /* probeprov:probemod:probefunc:probname */
+	printf("%s {\"event\": \"%s:%s:%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"id\": \"%s\"}\n",
+	    comma, probeprov, probemod, probefunc, probename, walltimestamp, pid, tid, uid, execname, copyinstr(arg0));
 	comma=",";
 }
 
 postgresql$target:::query-start,
 postgresql$target:::query-done
 {
-	printf("%s {\"event\": \"%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"query\": \"%s\"}\n",
-	    comma, probefunc, probename, walltimestamp, pid, tid, uid, execname, copyinstr(arg0));
+	printf("%s {\"event\": \"%s:%s:%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"query\": \"%s\"}\n",
+	    comma, probeprov, probemod, probefunc, probename, walltimestamp, pid, tid, uid, execname, copyinstr(arg0));
 	comma=",";
 }

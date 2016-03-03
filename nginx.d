@@ -21,14 +21,14 @@ END {
 /*
 pid$target:nginx::entry
 {
-	printf("%s {\"event\": \"%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\"}\n",
-	    comma, probefunc, probename, walltimestamp, pid, tid, uid, execname);
+	printf("%s {\"event\": \"%s:%s:%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\"}\n",
+	    comma, probeprov, probemod, probefunc, probename, walltimestamp, pid, tid, uid, execname);
 }
 
 pid$target:nginx::return
 {
-	printf("%s {\"event\": \"%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\"}\n",
-	    comma, probefunc, probename, walltimestamp, pid, tid, uid, execname);
+	printf("%s {\"event\": \"%s:%s:%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\"}\n",
+	    comma, probeprov, probemod, probefunc, probename, walltimestamp, pid, tid, uid, execname);
 }
 */
 
@@ -36,15 +36,15 @@ pid$target:nginx::return
 
 pid$target:nginx:main:entry
 {
-	printf("%s {\"event\": \"%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"args\": \"%s\"}\n",
-	    comma, probefunc, probename, walltimestamp, pid, tid, uid, execname, "WIP");
+	printf("%s {\"event\": \"%s:%s:%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"args\": \"%s\"}\n",
+	    comma, probeprov, probemod, probefunc, probename, walltimestamp, pid, tid, uid, execname, "WIP");
 	comma=",";
 }
 
 pid$target:nginx:ngx_signal_process:entry
 {
-	printf("%s {\"event\": \"%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"args\": \"%s\"}\n",
-	    comma, probefunc, probename, walltimestamp, pid, tid, uid, execname, copyinstr(arg1));
+	printf("%s {\"event\": \"%s:%s:%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"args\": \"%s\"}\n",
+	    comma, probeprov, probemod, probefunc, probename, walltimestamp, pid, tid, uid, execname, copyinstr(arg1));
 	comma=",";
 }
 
