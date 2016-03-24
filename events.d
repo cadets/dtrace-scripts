@@ -3,7 +3,8 @@
 #pragma D option quiet
 #pragma D option switchrate=10hz
 #pragma D option dynvarsize=16m
-#pragma D option bufsize=8m
+#pragma D option bufsize=16m
+#pragma D option strsize=1024
 
 /* If AF_INET and AF_INET6 are "Unknown" to DTrace, replace with numbers: */
 inline int af_inet = 2 /*AF_INET*/;
@@ -74,16 +75,14 @@ syscall::dup*:return
 	comma=",";
 }
 
-/* TODO: Add support for fds[arg0].fi_pathname */
 syscall::read:entry,syscall::write:entry,
 syscall::pread:entry,syscall::pwrite:entry,
 syscall::readv:entry,syscall::writev:entry,
-syscall::pread:entry,syscall::pwrite:entry,
 syscall::preadv:entry,syscall::pwritev:entry
 /pid != $pid && execname != "sshd" && execname != "tmux"/
 {
-	printf("%s {\"event\": \"%s:%s:%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d}\n",
-	    comma, probeprov, probemod, probefunc, probename, walltimestamp, pid, tid, uid, execname, arg0);
+	printf("%s {\"event\": \"%s:%s:%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d, \"path\": \"%s\" }\n",
+	    comma, probeprov, probemod, probefunc, probename, walltimestamp, pid, tid, uid, execname, arg0, fds[arg0].fi_pathname);
 	comma=",";
 }
 
