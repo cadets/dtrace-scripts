@@ -94,12 +94,11 @@ syscall::execve:entry
 	comma=",";
 }
 
-
-syscall::fork:entry,syscall::rfork:entry,syscall::vfork:entry
+syscall::fork:return,syscall::rfork:return,syscall::vfork:return
 /pid != $pid/
 {
-	printf("%s {\"event\": \"%s:%s:%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\"}\n",
-	    comma, probeprov, probemod, probefunc, probename, walltimestamp, pid, tid, uid, execname);
+	printf("%s {\"event\": \"%s:%s:%s:%s\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"new_pid\": %d }\n",
+	    comma, probeprov, probemod, probefunc, probename, walltimestamp, pid, tid, uid, execname, arg0);
 	comma=",";
 }
 
