@@ -73,7 +73,7 @@ syscall::read:entry,syscall::write:entry,
 syscall::pread:entry,syscall::pwrite:entry,
 syscall::readv:entry,syscall::writev:entry,
 syscall::preadv:entry,syscall::pwritev:entry
-/pid != $pid && execname != "sshd" && execname != "tmux"/
+/pid != $pid && execname != "sshd" && execname != "tmux" && execname != "moused"/
 {
 	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d, \"path\": \"%s\" }\n",
 	    comma, probeprov, probemod, probefunc, walltimestamp, pid, tid, uid, execname, arg0, fds[arg0].fi_pathname);
