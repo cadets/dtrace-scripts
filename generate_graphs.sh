@@ -17,6 +17,10 @@ grep 'read' $1 | sed -n -E 's/.*"event": "[[:alnum:]_-]*:[[:alnum:]_-]*:(.?read[
     "p_\2_\3" [label="\3\
 p\2", shape="box"];\
     "f_\4" -> "p_\2_\3" [label="read", color="black"];/p'
+grep 'mmap' $1 | sed -n -E 's/.*"event": "[[:alnum:]_-]*:[[:alnum:]_-]*:(.?mmap[[:alnum:]_-]*):".*"pid": ([[:digit:]]*).*"exec": "([[:alnum:]_-]*)".*"path": "([ [:alnum:]\\\/_.-]*)".*/    p_\2 [label="pid \2", shape="diamond"];\
+    "p_\2_\3" [label="\3\
+p\2", shape="box"];\
+    "f_\4" -> "p_\2_\3" [label="mmap", color="black"];/p'
 echo "}" 
 } > ${file_name}_data_flow.dot
 
