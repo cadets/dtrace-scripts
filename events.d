@@ -91,8 +91,8 @@ syscall::preadv:entry,syscall::pwritev:entry
 syscall::execve:entry
 /pid != $pid/
 {
-	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"ppid\": %d, \"uid\": %d, \"exec\": \"%s\"}\n",
-	    comma, probeprov, probemod, probefunc, walltimestamp, pid, tid, ppid, uid, copyinstr(arg0));
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"ppid\": %d, \"uid\": %d, \"exec\": \"%s\", \"new_exec\": \"%s\"}\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, tid, ppid, uid, execname, copyinstr(arg0));
 	comma=",";
 }
 
