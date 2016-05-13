@@ -47,6 +47,22 @@ syscall::openat:return
 	comma=",";
 }
 
+syscall::rename:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"new_path\": \"%s\" }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, copyinstr(arg0), copyinstr(arg1));
+	comma=",";
+}
+
+syscall::renameat:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"new_path\": \"%s\" }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, copyinstr(arg1), copyinstr(arg3));
+	comma=",";
+}
+
 syscall::close:entry
 /pid != $pid/
 {
