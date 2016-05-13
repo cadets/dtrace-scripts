@@ -213,3 +213,32 @@ syscall::accept*:return
 {
 	self->sa = 0; self->start = 0;
 }
+
+syscall:freebsd:setuid:entry, syscall:freebsd:setgid:entry,
+syscall:freebsd32:setuid:entry, syscall:freebsd32:setgid:entry,
+syscall:freebsd:seteuid:entry, syscall:freebsd:setegid:entry,
+syscall:freebsd32:seteuid:entry, syscall:freebsd32:setegid:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"new_id\": %d }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, args[0]);
+	comma=",";
+}
+
+syscall:freebsd:setreuid:entry, syscall:freebsd:setregid:entry,
+syscall:freebsd32:setreuid:entry, syscall:freebsd32:setregid:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"new_real_id\": %d, \"new_effective_id\": %d }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, args[0], args[1]);
+	comma=",";
+}
+
+syscall:freebsd:setresuid:entry, syscall:freebsd:setresgid:entry,
+syscall:freebsd32:setresuid:entry, syscall:freebsd32:setresgid:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"new_real_id\": %d, \"new_effective_id\": %d, \"new_saved_id\": %d }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, args[0], args[1], args[2]);
+	comma=",";
+}
