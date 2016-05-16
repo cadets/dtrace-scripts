@@ -242,3 +242,14 @@ syscall:freebsd32:setresuid:entry, syscall:freebsd32:setresgid:entry
 	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, args[0], args[1], args[2]);
 	comma=",";
 }
+
+/* For some reason, the syscall pipe probe doesn't provide the arguements on entry
+syscall:freebsd:pipe:entry, syscall:freebsd32:pipe:entry,
+*/
+syscall:freebsd:pipe2:entry, syscall:freebsd32:pipe2:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"read_fd\": %d, \"write_fd\": %d }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, args[0][0], args[0][1]);
+	comma=",";
+}
