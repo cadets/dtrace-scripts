@@ -343,3 +343,11 @@ syscall:freebsd32:fchownat:entry
 	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, arg0, copyinstr(arg1), args[2], args[3]);
 	comma=",";
 }
+
+syscall::fcntl:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"cmd\": %d }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, fds[arg0].fi_pathname, args[1]);
+	comma=",";
+}
