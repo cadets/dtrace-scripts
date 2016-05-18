@@ -269,3 +269,19 @@ syscall::recvmsg:entry
 	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, args[0], args[2]);
 	comma=",";
 }
+
+syscall:freebsd:chdir:entry, syscall:freebsd32:chdir:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\" }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, copyinstr(arg0));
+	comma=",";
+}
+
+syscall::fchdir:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\" }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, fds[arg0].fi_pathname);
+	comma=",";
+}
