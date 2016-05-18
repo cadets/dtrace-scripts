@@ -351,3 +351,21 @@ syscall::fcntl:entry
 	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, fds[arg0].fi_pathname, args[1]);
 	comma=",";
 }
+
+syscall:freebsd:link:entry,
+syscall:freebsd32:link:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"new_path\": \"%s\" }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, fds[arg0].fi_pathname, fds[arg1].fi_pathname);
+	comma=",";
+}
+
+syscall:freebsd:linkat:entry,
+syscall:freebsd32:linkat:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d, \"path\": \"%s\", \"new_fd\": %d, \"new_path\": \"%s\" }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, arg0, fds[arg1].fi_pathname, arg2, fds[arg3].fi_pathname);
+	comma=",";
+}
