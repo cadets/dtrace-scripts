@@ -314,3 +314,32 @@ syscall:freebsd32:fchmodat:entry
 	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, arg0, copyinstr(arg1), args[2]);
 	comma=",";
 }
+
+syscall:freebsd:chown:entry,
+syscall:freebsd:lchown:entry,
+syscall:freebsd32:chown:entry,
+syscall:freebsd32:lchown:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"owner\": %d, \"group\": %d }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, copyinstr(arg0), args[1], args[2]);
+	comma=",";
+}
+
+syscall:freebsd:fchown:entry,
+syscall:freebsd32:fchown:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"owner\": %d, \"group\": %d }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, fds[arg0].fi_pathname, args[1], args[2]);
+	comma=",";
+}
+
+syscall:freebsd:fchownat:entry,
+syscall:freebsd32:fchownat:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d, \"path\": \"%s\", \"owner\": %d, \"group\": %d }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, arg0, copyinstr(arg1), args[2], args[3]);
+	comma=",";
+}
