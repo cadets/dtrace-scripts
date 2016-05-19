@@ -395,3 +395,21 @@ syscall:freebsd32:mkdirat:entry
 	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, arg0, copyinstr(arg1), arg2);
 	comma=",";
 }
+
+syscall:freebsd:rename:entry,
+syscall:freebsd32:rename:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"new_path\": \"%s\" }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, copyinstr(arg0), copyinstr(arg1));
+	comma=",";
+}
+
+syscall:freebsd:renameat:entry,
+syscall:freebsd32:renameat:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d, \"path\": \"%s\", \"new_fd\": %d, \"new_path\": \"%s\" }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, arg0, fds[arg1].fi_pathname, arg2, fds[arg3].fi_pathname);
+	comma=",";
+}
