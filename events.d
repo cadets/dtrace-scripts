@@ -413,3 +413,12 @@ syscall:freebsd32:renameat:entry
 	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, arg0, fds[arg1].fi_pathname, arg2, fds[arg3].fi_pathname);
 	comma=",";
 }
+
+syscall:freebsd:rmdir:entry,
+syscall:freebsd32:rmdir:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\" }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, copyinstr(arg0));
+	comma=",";
+}
