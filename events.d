@@ -377,3 +377,21 @@ syscall::lseek:entry
 	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, fds[arg0].fi_pathname, arg1, arg2);
 	comma=",";
 }
+
+syscall:freebsd:mkdir:entry,
+syscall:freebsd32:mkdir:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"mode\": %d }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, copyinstr(arg0), arg1);
+	comma=",";
+}
+
+syscall:freebsd:mkdirat:entry,
+syscall:freebsd32:mkdirat:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d, \"path\": \"%s\", \"mode\": %d }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, arg0, copyinstr(arg1), arg2);
+	comma=",";
+}
