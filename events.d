@@ -439,3 +439,11 @@ syscall::sendmsg:entry
 	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, args[0], args[2]);
 	comma=",";
 }
+
+syscall::sigaction:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"signal\": %d, \"act\": %d, \"flags\": %d,  \"oact\": %d }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, args[0], arg1, arg1 > 0 ? args[1]->sa_flags : 0, arg2);
+	comma=",";
+}
