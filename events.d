@@ -477,3 +477,20 @@ syscall:freebsd32:socketpair:return
 	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, self->domain, self->type, self->signal, self->sds2[0], self->sds2[1]);
 	comma=",";
 }
+
+syscall::symlink:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"new_path\": \"%s\" }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, copyinstr(arg0), copyinstr(arg1));
+	comma=",";
+}
+
+syscall:freebsd:symlinkat:entry,
+syscall:freebsd32:symlinkat:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"fd\": %d, \"new_path\": \"%s\" }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, copyinstr(arg0), args[1], copyinstr(arg2));
+	comma=",";
+}
