@@ -447,3 +447,33 @@ syscall::sigaction:entry
 	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, args[0], arg1, arg1 > 0 ? args[1]->sa_flags : 0, arg2);
 	comma=",";
 }
+
+syscall:freebsd:socket:entry,
+syscall:freebsd32:socket:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"domain\": %d, \"type\": %d, \"signal\": %d }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, args[0], args[1], args[2]);
+	comma=",";
+}
+
+syscall:freebsd:socketpair:entry,
+syscall:freebsd32:socketpair:entry
+/pid != $pid/
+{
+    self->domain=args[0];
+    self->type=args[1];
+    self->signal=args[2];
+    self->sds=arg3;
+	comma=",";
+}
+
+syscall:freebsd:socketpair:return,
+syscall:freebsd32:socketpair:return
+/pid != $pid/
+{
+    self->sds2=(int *) copyin(self->sds, sizeof(int[2]));
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"domain\": %d, \"type\": %d, \"signal\": %d, \"new_socket\": %d, \"new_socket2\": %d }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, self->domain, self->type, self->signal, self->sds2[0], self->sds2[1]);
+	comma=",";
+}
