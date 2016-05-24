@@ -510,3 +510,10 @@ syscall::ftruncate:entry
 	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, fds[arg0].fi_pathname, args[1]);
 	comma=",";
 }
+
+syscall:freebsd:umask:entry,
+syscall:freebsd32:umask:entry
+/pid != $pid/
+{
+    self->new_mask = args[0];
+}
