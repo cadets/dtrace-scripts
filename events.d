@@ -472,9 +472,9 @@ syscall:freebsd:socketpair:return,
 syscall:freebsd32:socketpair:return
 /pid != $pid/
 {
-    self->sds2=(int *) copyin(self->sds, sizeof(int[2]));
+    this->sds2=(int *) copyin(self->sds, sizeof(int[2]));
 	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"domain\": %d, \"type\": %d, \"signal\": %d, \"new_socket\": %d, \"new_socket2\": %d }\n",
-	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, self->domain, self->type, self->signal, self->sds2[0], self->sds2[1]);
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, self->domain, self->type, self->signal, this->sds2[0], this->sds2[1]);
 	comma=",";
 }
 
@@ -547,9 +547,9 @@ syscall::utimes:entry,
 syscall::lutimes:entry
 /pid != $pid && arg1 != 0/
 {
-    self->times=args[1];
+    this->times=args[1];
 	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"create_time\": %d, \"mod_time\": %d }\n",
-	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, copyinstr(arg0), self->times[0].tv_sec*1000000+self->times[0].tv_usec, self->times[1].tv_sec*1000000+self->times[1].tv_usec);
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, copyinstr(arg0), this->times[0].tv_sec*1000000+this->times[0].tv_usec, this->times[1].tv_sec*1000000+this->times[1].tv_usec);
 	comma=",";
 }
 
@@ -564,9 +564,9 @@ syscall::futimes:entry
 syscall::futimes:entry
 /pid != $pid && arg1 != 0/
 {
-    self->times=args[1];
+    this->times=args[1];
 	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"create_time\": %d, \"mod_time\": %d }\n",
-	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, fds[arg0].fi_pathname, self->times[0].tv_sec*1000000+self->times[0].tv_usec, self->times[1].tv_sec*1000000+self->times[1].tv_usec);
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, fds[arg0].fi_pathname, this->times[0].tv_sec*1000000+this->times[0].tv_usec, this->times[1].tv_sec*1000000+this->times[1].tv_usec);
 	comma=",";
 }
 
@@ -581,8 +581,8 @@ syscall::futimesat:entry
 syscall::futimesat:entry
 /pid != $pid && arg2 != 0/
 {
-    self->times=args[2];
+    this->times=args[2];
 	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d, \"path\": \"%s\", \"create_time\": %d, \"mod_time\": %d }\n",
-	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, arg0, copyinstr(arg1), self->times[0].tv_sec*1000000+self->times[0].tv_usec, self->times[1].tv_sec*1000000+self->times[1].tv_usec);
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, arg0, copyinstr(arg1), this->times[0].tv_sec*1000000+this->times[0].tv_usec, this->times[1].tv_sec*1000000+this->times[1].tv_usec);
 	comma=",";
 }
