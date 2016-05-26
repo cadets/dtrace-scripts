@@ -19,24 +19,12 @@ END {
   printf("]\n");
 }
 
-syscall::open:entry
-/pid != $pid/
-{
-    self->file_name_open = copyinstr(arg0);
-}
-
 syscall::open:return
 /pid != $pid/
 {
 	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"fd\": %d}\n",
 	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, fds[arg0].fi_pathname, arg0);
 	comma=",";
-}
-
-syscall::openat:entry
-/pid != $pid/
-{
-    self->file_name_openat = copyinstr(arg1);
 }
 
 syscall::openat:return
