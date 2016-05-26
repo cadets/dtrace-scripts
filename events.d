@@ -544,7 +544,7 @@ syscall::utimes:entry,
 syscall::lutimes:entry
 /pid != $pid && arg1 != 0/
 {
-    this->times=args[1];
+    this->times=(struct timeval *)copyin(arg1, sizeof (struct timeval));
 	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"create_time\": %d, \"mod_time\": %d }\n",
 	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, copyinstr(arg0), this->times[0].tv_sec*1000000+this->times[0].tv_usec, this->times[1].tv_sec*1000000+this->times[1].tv_usec);
 	comma=",";
@@ -561,7 +561,7 @@ syscall::futimes:entry
 syscall::futimes:entry
 /pid != $pid && arg1 != 0/
 {
-    this->times=args[1];
+    this->times=(struct timeval *)copyin(arg1, sizeof (struct timeval));
 	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"create_time\": %d, \"mod_time\": %d }\n",
 	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, fds[arg0].fi_pathname, this->times[0].tv_sec*1000000+this->times[0].tv_usec, this->times[1].tv_sec*1000000+this->times[1].tv_usec);
 	comma=",";
@@ -578,7 +578,7 @@ syscall::futimesat:entry
 syscall::futimesat:entry
 /pid != $pid && arg2 != 0/
 {
-    this->times=args[2];
+    this->times=(struct timeval *)copyin(arg2, sizeof (struct timeval));
 	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d, \"path\": \"%s\", \"create_time\": %d, \"mod_time\": %d }\n",
 	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, arg0, copyinstr(arg1), this->times[0].tv_sec*1000000+this->times[0].tv_usec, this->times[1].tv_sec*1000000+this->times[1].tv_usec);
 	comma=",";
