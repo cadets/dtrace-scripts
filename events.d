@@ -429,10 +429,19 @@ syscall::sendmsg:entry
 }
 
 syscall::sigaction:entry
-/pid != $pid/
+/pid != $pid && arg1 > 0/
 {
+	this->act= (struct sigaction *) copyin(arg1, sizeof(struct sigaction));
 	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"signal\": %d, \"act\": %d, \"flags\": %d,  \"oact\": %d }\n",
-	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, args[0], arg1, arg1 > 0 ? args[1]->sa_flags : 0, arg2);
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, args[0], arg1, this->act->sa_flags, arg2);
+	comma=",";
+}
+
+syscall::sigaction:entry
+/pid != $pid && arg1 == 0/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"signal\": %d, \"act\": %d, \"oact\": %d }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, args[0], arg1, arg2);
 	comma=",";
 }
 
