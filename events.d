@@ -26,7 +26,7 @@ syscall::open:entry
 }
 
 syscall::open:return
-/pid != $pid/
+/pid != $pid && arg0 >= 0/
 {
 	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"fd\": %d}\n",
 	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, fds[arg0].fi_pathname, arg0);
@@ -40,7 +40,7 @@ syscall::openat:entry
 }
 
 syscall::openat:return
-/pid != $pid/
+/pid != $pid && arg0 != -1/
 {
 	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"fd\": %d}\n",
 	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, fds[arg0].fi_pathname, arg0);
@@ -81,7 +81,7 @@ syscall::read:entry,syscall::write:entry,
 syscall::pread:entry,syscall::pwrite:entry,
 syscall::readv:entry,syscall::writev:entry,
 syscall::preadv:entry,syscall::pwritev:entry
-/pid != $pid && execname != "sshd" && execname != "tmux" && execname != "moused"/
+/pid != $pid && execname != "sshd" && execname != "tmux" && execname != "moused" && fds[arg0].fi_pathname != "/dev/tty"/
 {
 	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d, \"path\": \"%s\" }\n",
 	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, arg0, fds[arg0].fi_pathname);
@@ -97,7 +97,7 @@ syscall::execve:entry
 }
 
 syscall::fork:return,syscall::rfork:return,syscall::vfork:return
-/pid != $pid/
+/pid != $pid && arg0 != -1/
 {
 	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"new_pid\": %d }\n",
 	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, arg0);
