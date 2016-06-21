@@ -100,6 +100,14 @@ syscall::execve:entry
 	comma=",";
 }
 
+syscall::fexecve:entry
+/pid != $pid/
+{
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"ppid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d, \"new_exec\": \"%s\"}\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, tid, ppid, uid, execname, arg0, fds[arg0].fi_pathname);
+	comma=",";
+}
+
 syscall::fork:return,syscall::rfork:return,syscall::vfork:return
 /pid != $pid/
 {
