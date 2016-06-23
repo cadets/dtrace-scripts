@@ -23,13 +23,14 @@ syscall::open:entry
 /pid != $pid/
 {
     self->file_name_open = copyinstr(arg0);
+    self->flags_open = arg1;
 }
 
 syscall::open:return
 /pid != $pid && arg0 >= 0/
 {
-	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"fd\": %d}\n",
-	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, fds[arg0].fi_pathname, arg0);
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"fd\": %d, \"args\": \"0x%x\"}\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, fds[arg0].fi_pathname, arg0, self->flags_open);
 	comma=",";
 }
 
@@ -37,13 +38,14 @@ syscall::openat:entry
 /pid != $pid/
 {
     self->file_name_openat = copyinstr(arg1);
+    self->flags_openat = arg2;
 }
 
 syscall::openat:return
 /pid != $pid && arg0 != -1/
 {
-	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"fd\": %d}\n",
-	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, fds[arg0].fi_pathname, arg0);
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"fd\": %d, \"args\": \"0x%x\"}\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, fds[arg0].fi_pathname, arg0, self->flags_openat);
 	comma=",";
 }
 
