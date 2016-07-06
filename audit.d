@@ -82,10 +82,20 @@ END {
   printf("]\n");
 }
 
+/*
+audit::aue_*:commit
+/pid != $pid && 1 == 0/
+{
+    this->record = (struct audit_record*) arg1;
+	printf("%s {\"event\": \"%s:%s:%s:\", \"valid_mask\": %x }\n",
+	    comma, probeprov, probemod, probefunc, this->record->ar_valid_arg);
+}
+*/
+
 audit::aue_fexecve:commit,
 audit::aue_exec:commit,
 audit::aue_execve:commit
-/pid != $pid && 1 == 0/
+/pid != $pid/
 {
     this->record = (struct audit_record*) arg1;
     printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"new_exec\": \"%s\"}\n",
@@ -95,29 +105,29 @@ audit::aue_execve:commit
 
 audit::aue_open*:commit,
 audit::aue_openat*:commit
-/pid != $pid && 1 == 0/
+/pid != $pid/
 {
     /* TODO Missing fd */
     this->record = (struct audit_record*) arg1;
-	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"fd\": %x, \"args\": \"0x%x\"}\n",
-	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, IS_VALID(ARG_UPATH1)?stringof(this->record->ar_arg_upath1):"", this->record->ar_valid_arg/*IS_VALID(ARG_FD)?this->record->ar_arg_fd:-1*/, IS_VALID(ARG_FFLAGS)?this->record->ar_arg_fflags:0);
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"fd\": %d, \"args\": \"0x%x\" }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, IS_VALID(ARG_UPATH1)?stringof(this->record->ar_arg_upath1):"", IS_VALID(ARG_FD)?this->record->ar_arg_fd:-1, IS_VALID(ARG_FFLAGS)?this->record->ar_arg_fflags:0);
 	comma=",";
 }
 
 audit::aue_close:commit
-/pid != $pid && 1 == 0/
+/pid != $pid /
 {
     /* TODO path */
     this->record = (struct audit_record*) arg1;
-	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"fd\": %x }\n",
-	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, /*IS_VALID(ARG_FD)?fds[this->record->ar_arg_fd].fi_pathname:*/"", IS_VALID(ARG_FD)?this->record->ar_arg_fd:-1);
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"fd\": %d }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, IS_VALID(ARG_FD)?fds[this->record->ar_arg_fd].fi_pathname:"", IS_VALID(ARG_FD)?this->record->ar_arg_fd:-1);
     comma=",";
 }
 
 audit::aue_fork:commit,
 audit::aue_vfork:commit,
 audit::aue_rfork:commit
-/pid != $pid && 1 == 0/
+/pid != $pid/
 {
     this->record = (struct audit_record*) arg1;
 	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"new_pid\": %d }\n",
@@ -126,12 +136,12 @@ audit::aue_rfork:commit
 }
 
 audit::aue_dup*:commit
-/pid != $pid && 1 == 0/
+/pid != $pid/
 {
     /* TODO fd and new_fd*/
     this->record = (struct audit_record*) arg1;
-    printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"new_fd\": %d, \"fd\": %x }\n",
-        comma, probeprov, probemod, probefunc, walltimestamp, this->record->ar_subj_pid, ppid, tid, this->record->ar_subj_ruid, execname, this->record->ar_retval, this->record->ar_valid_arg);
+    printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"new_fd\": %d, \"fd\": %d }\n",
+        comma, probeprov, probemod, probefunc, walltimestamp, this->record->ar_subj_pid, ppid, tid, this->record->ar_subj_ruid, execname, this->record->ar_retval, IS_VALID(ARG_FD)?this->record->ar_arg_fd:-1);
     comma=",";
 }
 
@@ -139,17 +149,17 @@ audit::aue_*read:commit,
 audit::aue_*readv:commit,
 audit::aue_*write:commit,
 audit::aue_*writev:commit
-/pid != $pid && execname != "sshd" && execname != "tmux" && execname != "moused" && 1 == 0/
+/pid != $pid && execname != "sshd" && execname != "tmux" && execname != "moused" /
 {
     /*TODO missing fd/path */
     this->record = (struct audit_record*) arg1;
-	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %x, \"path\": \"%s\" }\n",
-	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, this->record->ar_valid_arg, IS_VALID(ARG_UPATH1)?this->record->ar_arg_upath1:"");
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d, \"path\": \"%s\" }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, IS_VALID(ARG_FD)?this->record->ar_arg_fd:-1, IS_VALID(ARG_UPATH1)?this->record->ar_arg_upath1:"");
 	comma=",";
 }
 
 audit::aue_exit:commit
-/pid != $pid && 1 == 0/
+/pid != $pid/
 {
 	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\"}\n",
 	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname);
@@ -157,12 +167,12 @@ audit::aue_exit:commit
 }
 
 audit::aue_mmap:commit
-/pid != $pid && execname != "sshd" && execname != "tmux" && execname != "moused" && 1 == 0/
+/pid != $pid && execname != "sshd" && execname != "tmux" && execname != "moused"/
 {
     /*TODO missing fd/path */
     this->record = (struct audit_record*) arg1;
-	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %x, \"path\": \"%s\" }\n",
-	    comma, probeprov, probemod, probefunc, walltimestamp, pid, tid, uid, execname, this->record->ar_valid_arg, IS_VALID(ARG_UPATH1)?this->record->ar_arg_upath1:"");
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d, \"path\": \"%s\" }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, tid, uid, execname, IS_VALID(ARG_FD)?this->record->ar_arg_fd:-1, IS_VALID(ARG_UPATH1)?this->record->ar_arg_upath1:"");
 	comma=",";
 }
 
