@@ -71,7 +71,7 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 #define ARG_FCNTL_RIGHTS   0x0020000000000000ULL
 #define ARG_NONE           0x0000000000000000ULL
 #define ARG_ALL            0xFFFFFFFFFFFFFFFFULL
-#define IS_VALID(arg)  (this->record->ar_valid_arg & (arg))
+#define IS_VALID(arg)  (args[1]->ar_valid_arg & (arg))
 
 BEGIN {
     printf("[\n");
@@ -105,11 +105,11 @@ audit::aue_execve:commit
 
 audit::aue_open*:commit,
 audit::aue_openat*:commit
-/pid != $pid/
+/pid != $pid && args[1]->ar_retval >= 0/
 {
     this->record = (struct audit_record*) arg1;
     printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"fd\": %d, \"args\": \"0x%x\" }\n",
-        comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, IS_VALID(ARG_UPATH1)?stringof(this->record->ar_arg_upath1):"", IS_VALID(ARG_FD)?this->record->ar_arg_fd:-1, IS_VALID(ARG_FFLAGS)?this->record->ar_arg_fflags:0);
+        comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, IS_VALID(ARG_UPATH1)?stringof(this->record->ar_arg_upath1):"", this->record->ar_retval, IS_VALID(ARG_FFLAGS)?this->record->ar_arg_fflags:0);
     comma=",";
 }
 
@@ -126,7 +126,7 @@ audit::aue_close:commit
 audit::aue_fork:commit,
 audit::aue_vfork:commit,
 audit::aue_rfork:commit
-/pid != $pid/
+/pid != $pid && args[1]->ar_retval >= 0/
 {
     this->record = (struct audit_record*) arg1;
     printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"new_pid\": %d }\n",
@@ -165,12 +165,12 @@ audit::aue_exit:commit
 }
 
 audit::aue_mmap:commit
-/pid != $pid && execname != "sshd" && execname != "tmux" && execname != "moused"/
+/IS_VALID(ARG_FD) && args[1]->ar_arg_fd != -1 && pid != $pid && execname != "sshd" && execname != "tmux" && execname != "moused"/
 {
     /*TODO missing path */
     this->record = (struct audit_record*) arg1;
     printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d, \"path\": \"%s\" }\n",
-        comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, IS_VALID(ARG_FD)?this->record->ar_arg_fd:-1, IS_VALID(ARG_UPATH1)?this->record->ar_arg_upath1:"");
+        comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, this->record->ar_arg_fd, IS_VALID(ARG_UPATH1)?this->record->ar_arg_upath1:"");
     comma=",";
 }
 
