@@ -41,11 +41,11 @@ sed -n -E 's/.*"event": "[[:alnum:]_-]*:[[:alnum:]_-]*:([[:alnum:]_-]*):".*"pid"
     "e_\2_\3" [label="\3", shape="box"];\
      p_\2 -> "e_\2_\3" [dir="none", minlen=2];\
     "e_\2_\3" -> "f_\4" [label="\1"];/p' $1
-grep 'new_exec' $1 | sed -n -E 's/.*"event": "[[:alnum:]_-]*:[[:alnum:]_-]*:(.?exec[[:alnum:]_-]*):".*"pid": ([[:digit:]]*).*"uid": ([[:digit:]]*).*"exec": "([[:alnum:]_-]*)".*"new_exec": "([ [:alnum:]_.-]*\/)*([ [:alnum:]_.-]*)".*/    p_\2 [label="pid \2", shape="diamond"];\
+grep 'new_exec' $1 | sed -n -E 's/.*"event": "[[:alnum:]_-]*:[[:alnum:]_-]*:(.{0,5}exec[[:alnum:]_-]*):".*"pid": ([[:digit:]]*).*"uid": ([[:digit:]]*).*"exec": "([[:alnum:]_-]*)".*"new_exec": "([ [:alnum:]_.-]*\/)*([ [:alnum:]_.-]*)".*/    p_\2 [label="pid \2", shape="diamond"];\
     "e_\2_\6" [label="{{\6 | p\2}}", shape="record"];\
     "e_\2_\4" [label="{{\4 | p\2}}", shape="record"];\
     "e_\2_\4" -> "e_\2_\6" [label="exec", color="black"];/p'
-grep 'fork' $1 | sed -n -E 's/.*"event": "[[:alnum:]_-]*:[[:alnum:]_-]*:(.?fork[[:alnum:]_-]*):".*"pid": ([[:digit:]]*).*"uid": ([[:digit:]]*).*"exec": "([[:alnum:]_-]*)".*"new_pid": ([[:digit:]]*).*/    p_\2 [label="pid \2", shape="diamond"];\
+grep 'fork' $1 | sed -n -E 's/.*"event": "[[:alnum:]_-]*:[[:alnum:]_-]*:(.{0,5}fork[[:alnum:]_-]*):".*"pid": ([[:digit:]]*).*"uid": ([[:digit:]]*).*"exec": "([[:alnum:]_-]*)".*"new_pid": ([[:digit:]]*).*/    p_\2 [label="pid \2", shape="diamond"];\
     "e_\5_\4" [label="{{\4 | p\5}}", shape="record"];\
     "e_\2_\4" [label="{{\4 | p\2}}", shape="record"];\
     "e_\2_\4" -> "e_\5_\4" [label="fork", color=gray15];/p'
