@@ -107,7 +107,6 @@ audit::aue_open*:commit,
 audit::aue_openat*:commit
 /pid != $pid/
 {
-    /* TODO Missing fd */
     this->record = (struct audit_record*) arg1;
     printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"path\": \"%s\", \"fd\": %d, \"args\": \"0x%x\" }\n",
         comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, IS_VALID(ARG_UPATH1)?stringof(this->record->ar_arg_upath1):"", IS_VALID(ARG_FD)?this->record->ar_arg_fd:-1, IS_VALID(ARG_FFLAGS)?this->record->ar_arg_fflags:0);
@@ -170,8 +169,8 @@ audit::aue_mmap:commit
 {
     /*TODO missing path */
     this->record = (struct audit_record*) arg1;
-    printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d, \"path\": \"%s\" }\n",
-        comma, probeprov, probemod, probefunc, walltimestamp, pid, tid, uid, execname, IS_VALID(ARG_FD)?this->record->ar_arg_fd:-1, IS_VALID(ARG_UPATH1)?this->record->ar_arg_upath1:"");
+    printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d, \"path\": \"%s\" }\n",
+        comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, IS_VALID(ARG_FD)?this->record->ar_arg_fd:-1, IS_VALID(ARG_UPATH1)?this->record->ar_arg_upath1:"");
     comma=",";
 }
 

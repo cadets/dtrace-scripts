@@ -74,8 +74,8 @@ syscall::dup*:return
 syscall::mmap:entry
 /arg4 != -1 && pid != $pid && execname != "sshd" && execname != "tmux" && execname != "moused"/
 {
-	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d, \"path\": \"%s\" }\n",
-	    comma, probeprov, probemod, probefunc, walltimestamp, pid, tid, uid, execname, arg4, fds[arg4].fi_pathname);
+	printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"fd\": %d, \"path\": \"%s\" }\n",
+	    comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, execname, arg4, fds[arg4].fi_pathname);
 	comma=",";
 }
 
