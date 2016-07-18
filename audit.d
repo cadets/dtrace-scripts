@@ -177,13 +177,13 @@ audit::aue_*:commit
 
     printf("%s",
 	IS_VALID(ARG_SADDRINET)?
-	strjoin(", \"address\": ", strjoin(
+	strjoin(", \"address\": \"", strjoin(
 	    inet_ntop(af_inet,(void*)&((struct sockaddr_in*) &this->record->ar_arg_sockaddr)->sin_addr), "\""))
 	:IS_VALID(ARG_SADDRINET6)?
-	strjoin(", \"address\": ", strjoin(
+	strjoin(", \"address\": \"", strjoin(
 	    inet_ntoa6(&((struct sockaddr_in6*) &this->record->ar_arg_sockaddr)->sin6_addr), "\""))
 	:IS_VALID(ARG_SADDRUNIX)?
-	strjoin(", \"address\": ", strjoin(
+	strjoin(", \"address\": \"", strjoin(
 		((struct sockaddr_un*) &this->record->ar_arg_sockaddr)->sun_path, "\""))
 	:"");
 
