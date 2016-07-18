@@ -183,7 +183,7 @@ audit::aue_*:commit
 	strjoin(", \"address\": ", strjoin(
 	    inet_ntoa6(&((struct sockaddr_in6*) &this->record->ar_arg_sockaddr)->sin6_addr), "\""))
 	:IS_VALID(ARG_SADDRUNIX)?
-	strjoin(", \address\": ", strjoin(
+	strjoin(", \"address\": ", strjoin(
 		((struct sockaddr_un*) &this->record->ar_arg_sockaddr)->sun_path, "\""))
 	:"");
 
