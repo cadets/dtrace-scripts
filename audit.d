@@ -9,6 +9,12 @@
 inline int af_inet = 2 /*AF_INET*/;
 inline int af_inet6 = 28 /*AF_INET6*/;
 
+/* Options to enable/disable instrumentation */
+#define AUDIT_ALL_CALLS 0
+#define AUDIT_FAILED_CALLS 0
+#define AUDIT_ANON_MMAP 0
+#define AUDIT_SSH_WRITES 0
+
 /* FROM security/audit/audit_private.h
  *
  * Arguments in the audit record are initially not defined; flags are set to
@@ -76,32 +82,18 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 #define ARG_ALL            0xFFFFFFFFFFFFFFFFULL
 #define IS_VALID(arg)  (args[1]->ar_valid_arg & (arg))
 
-/* Default filter on processes */
-#define proc_filter_def (pid != $pid)
-/* Filter on processes for read/write/mmap */
-#define proc_filter_rw (pid != $pid) && (execname != "sshd") && \
-	(execname != "tmux") && (execname != "moused")
-
-
-/* Fields that every event record will have */
 /*
  * UUIDS fields:
  * ar_subj_uuid: always the UUID of the process performing/authorizing the system call
  *  ar_arg_procuuid: UUID of a target process being operated on, or in the case of fork(2), the child process
  * ar_arg_objuuid1 and ar_arg_objuuid2: the optional first (and further optional second) UUIDs of other types of objects being operated on. Almost always vnode/pipe/socket UUIDs, but in the future presumably also other IPC types
  */
-#define print_common_fields						\
-    printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\"", comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, this->record->ar_subj_comm); \
-    printf(", \"subjuuid\": \"%U\", \"procuuid\": \"%U\", \"obj1uuid\": \"%U\", \"obj2uuid\": \"%U\"", args[1]->ar_subj_uuid, args[1]->ar_arg_procuuid, args[1]->ar_arg_objuuid1, args[1]->ar_arg_objuuid2);
 
+/* Convenience macro for printing audit fields */
 #define sprint_audit_string(flag, field, name) \
 	IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(stringof(this->record->field),"\"")):""
 #define sprint_audit_int(flag, field, name) \
 	IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": "), lltostr(this->record->field)):""
-
-
-#define SINGLE_AUDIT_PROBE 1
-#define ALL_AUDIT_PROBES 0
 
 /*
  * BEGIN and END probes
@@ -115,14 +107,16 @@ END {
   printf("]\n");
 }
 
-/*
- * Use the single audit probe
- */
-#if SINGLE_AUDIT_PROBE
-
 /* XXX: proc_filter */
+/* Default filter on processes */
+#define proc_filter_def (pid != $pid)
+/* Filter on processes for read/write/mmap */
+#define proc_filter_rw (pid != $pid) && (execname != "sshd") && \
+	(execname != "tmux") && (execname != "moused")
+
 /* XXX: Conditionally print UUIDs */
-#if ALL_AUDIT_PROBES
+
+#if AUDIT_ALL_CALLS
 audit::aue_*:commit
 #else
 audit::aue_fork:commit,audit::aue_vfork:commit,audit::aue_rfork:commit,
@@ -130,7 +124,7 @@ audit::aue_fexecve:commit,audit::aue_exec:commit,audit::aue_execve:commit,
 audit::aue_exit:commit,
 audit::aue_open_*:commit,audit::aue_openat_*:commit,
 audit::aue_dup*:commit,
-audit::aue_close:commit,
+audit::aue_close*:commit,
 audit::aue_rename*:commit,
 audit::aue_unlink*:commit,
 audit::aue_truncate:commit,audit::aue_ftruncate:commit,
@@ -170,11 +164,22 @@ audit::aue_utimes:commit,
 audit::aue_lutimes:commit,
 audit::aue_futimes*:commit
 #endif
-/(pid != $pid) && ((execname != "sshd") || ((execname == "sshd") &&
-	(probefunc != "aue_read") && (probefunc != "aue_write") && (probefunc != "aue_mmap")))/
+/(pid != $pid)
+#if !AUDIT_FAILED_CALLS
+    && (args[1]->ar_retval >= 0)
+#endif
+#if !AUDIT_ANON_MMAP
+    && IS_VALID(ARG_FD) && (args[1]->ar_arg_fd != -1)
+#endif
+#if !AUDIT_SSH_WRITES
+    && ((execname != "sshd") || ((execname == "sshd") &&
+	(probefunc != "aue_read") && (probefunc != "aue_write") && (probefunc != "aue_mmap")))
+#endif
+/
 {
     this->record = (struct audit_record*) arg1;
-    print_common_fields;
+    printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\"", comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, this->record->ar_subj_comm);
+    printf(", \"subjuuid\": \"%U\", \"procuuid\": \"%U\", \"obj1uuid\": \"%U\", \"obj2uuid\": \"%U\"", args[1]->ar_subj_uuid, args[1]->ar_arg_procuuid, args[1]->ar_arg_objuuid1, args[1]->ar_arg_objuuid2);
 
     printf("%s",
 	sprint_audit_int(ARG_PID, ar_arg_pid, arg_pid));
@@ -213,15 +218,6 @@ audit::aue_futimes*:commit
     printf("%s",
 	sprint_audit_int(ARG_SIGNUM, ar_arg_signum, signum));
 
-#if 0
-    printf("%s",
-	IS_VALID(ARG_SADDRINET)?
-	strjoin(", \"family\": ", lltostr(af_inet))
-	:IS_VALID(ARG_SADDRINET6)?
-	strjoin(", \"family\": ", lltostr(af_inet6))
-	:"");
-#endif
-
     printf("%s",
 	IS_VALID(ARG_SADDRINET)?
 	strjoin(", \"address\": \"", strjoin(
@@ -247,165 +243,3 @@ audit::aue_futimes*:commit
     printf("}\n");
     comma=",";
 }
-
-/* Individual audit probes */
-# else
-
-/*
- * Process probes
- */
-audit::aue_fork:commit,
-audit::aue_vfork:commit,
-audit::aue_rfork:commit
-/proc_filter_def && (args[1]->ar_retval >= 0)/
-{
-    this->record = (struct audit_record*) arg1;
-    print_common_fields;
-    printf(", \"new_pid\": %d}\n",
-        IS_VALID(ARG_PID)?this->record->ar_arg_pid:-1);
-    comma=",";
-}
-
-audit::aue_fexecve:commit,
-audit::aue_exec:commit,
-audit::aue_execve:commit
-/proc_filter_def/
-{
-    this->record = (struct audit_record*) arg1;
-    print_common_fields;
-    printf(", \"new_exec\": \"%s\"}\n",
-	IS_VALID(ARG_UPATH1)?this->record->ar_arg_upath1:execname);
-    comma=",";
-}
-
-audit::aue_exit:commit
-/proc_filter_def/
-{
-    this->record = (struct audit_record*) arg1;
-    print_common_fields;
-    printf("}\n");
-    comma=",";
-}
-
-/*
- * Filesystem probes
- */
-audit::aue_open*:commit
-/proc_filter_def && (args[1]->ar_retval >= 0)/
-{
-    this->record = (struct audit_record*) arg1;
-    print_common_fields;
-    printf(", \"path\": \"%s\", \"args\": \"0x%x\", \"new_fd\": %d}\n",
-	IS_VALID(ARG_UPATH1)?stringof(this->record->ar_arg_upath1):"", IS_VALID(ARG_FFLAGS)?this->record->ar_arg_fflags:0, this->record->ar_retval);
-    comma=",";
-}
-
-audit::aue_dup*:commit
-/proc_filter_def/
-{
-    this->record = (struct audit_record*) arg1;
-    print_common_fields;
-    printf(", \"fd\": %d, \"new_fd\": %d}\n",
-	IS_VALID(ARG_FD)?this->record->ar_arg_fd:-1, this->record->ar_retval);
-    comma=",";
-}
-
-audit::aue_close:commit
-/proc_filter_def/
-{
-    /* TODO path */
-    this->record = (struct audit_record*) arg1;
-    print_common_fields;
-    printf(", \"fd\": %d, \"path\": \"%s\"}\n",
-        IS_VALID(ARG_FD)?this->record->ar_arg_fd:-1, IS_VALID(ARG_UPATH1)?stringof(this->record->ar_arg_upath1):"");
-    comma=",";
-}
-
-/* XXX: renameat */
-audit::aue_rename*:commit
-/proc_filter_def/
-{
-    this->record = (struct audit_record*) arg1;
-    print_common_fields;
-    printf(", \"path\": \"%s\", \"new_path\": \"%s\"}\n",
-        IS_VALID(ARG_UPATH1)?stringof(this->record->ar_arg_upath1):"",
-	IS_VALID(ARG_UPATH2)?stringof(this->record->ar_arg_upath2):"");
-    comma=",";
-}
-
-/* XXX: unlinkat */
-audit::aue_unlink*:commit
-/proc_filter_def/
-{
-    this->record = (struct audit_record*) arg1;
-    print_common_fields;
-    printf(", \"path\": \"%s\"}\n",
-        IS_VALID(ARG_UPATH1)?stringof(this->record->ar_arg_upath1):"");
-    comma=",";
-}
-
-/* XXX: ftruncate */
-audit::aue_truncate:commit,
-audit::aue_ftruncate:commit
-/proc_filter_def/
-{
-    this->record = (struct audit_record*) arg1;
-    print_common_fields;
-    printf(", \"path\": \"%s\", \"length\": %d}\n",
-        IS_VALID(ARG_UPATH1)?stringof(this->record->ar_arg_upath1):"",
-	IS_VALID(ARG_LEN)?this->record->ar_arg_len:0);
-    comma=",";
-}
-
-audit::aue_*read:commit,
-audit::aue_*readv:commit,
-audit::aue_*write:commit,
-audit::aue_*writev:commit
-/proc_filter_rw/
-{
-    /*TODO missing path */
-    this->record = (struct audit_record*) arg1;
-    print_common_fields;
-    printf(", \"fd\": %d, \"path\": \"%s\"}\n",
-        IS_VALID(ARG_FD)?this->record->ar_arg_fd:-1, IS_VALID(ARG_UPATH1)?stringof(this->record->ar_arg_upath1):"");
-    comma=",";
-}
-
-audit::aue_mmap:commit
-/proc_filter_rw && IS_VALID(ARG_FD) && (args[1]->ar_arg_fd != -1)/
-{
-    /*TODO missing path */
-    this->record = (struct audit_record*) arg1;
-    print_common_fields;
-    printf(", \"fd\": %d, \"path\": \"%s\"}\n",
-        IS_VALID(ARG_FD)?this->record->ar_arg_fd:-1, IS_VALID(ARG_UPATH1)?stringof(this->record->ar_arg_upath1):"");
-    comma=",";
-}
-
-/*
- * Network probes
- */
-audit::aue_connect*:commit,
-audit::aue_accept*:commit
-/proc_filter_def/
-{
-    this->record = (struct audit_record*) arg1;
-    this->sockaddr = IS_VALID(ARG_SADDRINET)?
-                        inet_ntop(af_inet,(void*)&((struct sockaddr_in*) &this->record->ar_arg_sockaddr)->sin_addr)
-                     :IS_VALID(ARG_SADDRINET6)?
-                        inet_ntoa6(&((struct sockaddr_in6*) &this->record->ar_arg_sockaddr)->sin6_addr)
-                     :IS_VALID(ARG_SADDRUNIX)?
-                        ((struct sockaddr_un*) &this->record->ar_arg_sockaddr)->sun_path
-                     :"";
-    this->sockport = IS_VALID(ARG_SADDRINET)?
-                        ntohs(((struct sockaddr_in*) &this->record->ar_arg_sockaddr)->sin_port)
-                     :IS_VALID(ARG_SADDRINET6)?
-                        ntohs(((struct sockaddr_in6*) &this->record->ar_arg_sockaddr)->sin6_port)
-                     : -1;
-    print_common_fields;
-    printf(", \"family\": %d, \"address\": \"%s\", \"port\": %d, \"err\": %d}\n",
-        IS_VALID(ARG_SADDRINET)?af_inet:IS_VALID(ARG_SADDRINET6)?af_inet6:-1,
-        this->sockaddr, this->sockport, errno);
-    comma=",";
-}
-#endif
