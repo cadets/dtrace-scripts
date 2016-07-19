@@ -101,6 +101,7 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 
 
 #define SINGLE_AUDIT_PROBE 1
+#define ALL_AUDIT_PROBES 0
 
 /*
  * BEGIN and END probes
@@ -121,8 +122,54 @@ END {
 
 /* XXX: proc_filter */
 /* XXX: Conditionally print UUIDs */
-/* XXX: Enable only probes we want */
+#if ALL_AUDIT_PROBES
 audit::aue_*:commit
+#else
+audit::aue_fork:commit,audit::aue_vfork:commit,audit::aue_rfork:commit,
+audit::aue_fexecve:commit,audit::aue_exec:commit,audit::aue_execve:commit,
+audit::aue_exit:commit,
+audit::aue_open_*:commit,audit::aue_openat_*:commit,
+audit::aue_dup*:commit,
+audit::aue_close:commit,
+audit::aue_rename*:commit,
+audit::aue_unlink*:commit,
+audit::aue_truncate:commit,audit::aue_ftruncate:commit,
+audit::aue_*read:commit,audit::aue_readl:commit,
+audit::aue_*readv:commit,audit::aue_readvl:commit,
+audit::aue_write:commit,audit::aue_pwrite:commit,audit::aue_writev:commit,audit::aue_writel:commit,audit::aue_writevl:commit,
+audit::aue_mmap:commit,
+audit::aue_connect*:commit,
+audit::aue_accept*:commit,
+audit::aue_setuid:commit,audit::aue_setgid:commit,audit::aue_seteuid:commit,audit::aue_setegid:commit,
+audit::aue_setreuid:commit,audit::aue_setregid:commit,
+audit::aue_setresuid:commit,audit::aue_setresgid:commit,
+audit::aue_pipe*:commit,
+audit::aue_recvfrom:commit,
+audit::aue_recvmsg:commit,
+audit::aue_chdir:commit,
+audit::aue_fchdir:commit,
+audit::aue_chmod:commit,
+audit::aue_lchmod:commit,
+audit::aue_fchmod:commit,
+audit::aue_fchmodat:commit,
+audit::aue_chown:commit,
+audit::aue_lchown:commit,
+audit::aue_fchown:commit,
+audit::aue_fcntl:commit,
+audit::aue_link*:commit,
+audit::aue_lseek:commit,
+audit::aue_mkdir*:commit,
+audit::aue_rmdir:commit,
+audit::aue_sendto:commit,
+audit::aue_sendmsg:commit,
+audit::aue_socket:commit,
+audit::aue_socketpair:commit,
+audit::aue_symlink*:commit,
+audit::aue_umask:commit,
+audit::aue_utimes:commit,
+audit::aue_lutimes:commit,
+audit::aue_futimes*:commit
+#endif
 /(pid != $pid) && ((execname != "sshd") || ((execname == "sshd") &&
 	(probefunc != "aue_read") && (probefunc != "aue_write") && (probefunc != "aue_mmap")))/
 {
