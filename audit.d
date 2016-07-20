@@ -21,66 +21,72 @@ inline int af_inet6 = 28 /*AF_INET6*/;
  * indicate if they are present so they can be included in the audit log
  * stream only if defined.
  */
-#define ARG_EUID           0x0000000000000001ULL
-#define ARG_RUID           0x0000000000000002ULL
-#define ARG_SUID           0x0000000000000004ULL
-#define ARG_EGID           0x0000000000000008ULL
-#define ARG_RGID           0x0000000000000010ULL
-#define ARG_SGID           0x0000000000000020ULL
-#define ARG_PID            0x0000000000000040ULL
-#define ARG_UID            0x0000000000000080ULL
-#define ARG_AUID           0x0000000000000100ULL
-#define ARG_GID            0x0000000000000200ULL
-#define ARG_FD             0x0000000000000400ULL
-#define ARG_POSIX_IPC_PERM 0x0000000000000800ULL
-#define ARG_FFLAGS         0x0000000000001000ULL
-#define ARG_MODE           0x0000000000002000ULL
-#define ARG_DEV            0x0000000000004000ULL
-#define ARG_ADDR           0x0000000000008000ULL
-#define ARG_LEN            0x0000000000010000ULL
-#define ARG_MASK           0x0000000000020000ULL
-#define ARG_SIGNUM         0x0000000000040000ULL
-#define ARG_LOGIN          0x0000000000080000ULL
-#define ARG_SADDRINET      0x0000000000100000ULL
-#define ARG_SADDRINET6     0x0000000000200000ULL
-#define ARG_SADDRUNIX      0x0000000000400000ULL
-#define ARG_TERMID_ADDR    0x0000000000400000ULL
-#define ARG_UNUSED2        0x0000000001000000ULL
-#define ARG_UPATH1         0x0000000002000000ULL
-#define ARG_UPATH2         0x0000000004000000ULL
-#define ARG_TEXT           0x0000000008000000ULL
-#define ARG_VNODE1         0x0000000010000000ULL
-#define ARG_VNODE2         0x0000000020000000ULL
-#define ARG_SVIPC_CMD      0x0000000040000000ULL
-#define ARG_SVIPC_PERM     0x0000000080000000ULL
-#define ARG_SVIPC_ID       0x0000000100000000ULL
-#define ARG_SVIPC_ADDR     0x0000000200000000ULL
-#define ARG_GROUPSET       0x0000000400000000ULL
-#define ARG_CMD            0x0000000800000000ULL
-#define ARG_SOCKINFO       0x0000001000000000ULL
-#define ARG_ASID           0x0000002000000000ULL
-#define ARG_TERMID         0x0000004000000000ULL
-#define ARG_AUDITON        0x0000008000000000ULL
-#define ARG_VALUE          0x0000010000000000ULL
-#define ARG_AMASK          0x0000020000000000ULL
-#define ARG_CTLNAME        0x0000040000000000ULL
-#define ARG_PROCESS        0x0000080000000000ULL
-#define ARG_MACHPORT1      0x0000100000000000ULL
-#define ARG_MACHPORT2      0x0000200000000000ULL
-#define ARG_EXIT           0x0000400000000000ULL
-#define ARG_IOVECSTR       0x0000800000000000ULL
-#define ARG_ARGV           0x0001000000000000ULL
-#define ARG_ENVV           0x0002000000000000ULL
-#define ARG_ATFD1          0x0004000000000000ULL
-#define ARG_ATFD2          0x0008000000000000ULL
-#define ARG_RIGHTS         0x0010000000000000ULL
-#define ARG_FCNTL_RIGHTS   0x0020000000000000ULL
-#define ARG_PROCUUID       0x0040000000000000ULL
-#define ARG_OBJUUID1       0x0080000000000000ULL
-#define ARG_OBJUUID2       0x0100000000000000ULL
-#define ARG_NONE           0x0000000000000000ULL
-#define ARG_ALL            0xFFFFFFFFFFFFFFFFULL
-#define IS_VALID(arg)  (args[1]->ar_valid_arg & (arg))
+#define	ARG_EUID		0x0000000000000001ULL
+#define	ARG_RUID		0x0000000000000002ULL
+#define	ARG_SUID		0x0000000000000004ULL
+#define	ARG_EGID		0x0000000000000008ULL
+#define	ARG_RGID		0x0000000000000010ULL
+#define	ARG_SGID		0x0000000000000020ULL
+#define	ARG_PID			0x0000000000000040ULL
+#define	ARG_UID			0x0000000000000080ULL
+#define	ARG_AUID		0x0000000000000100ULL
+#define	ARG_GID			0x0000000000000200ULL
+#define	ARG_FD			0x0000000000000400ULL
+#define	ARG_POSIX_IPC_PERM	0x0000000000000800ULL
+#define	ARG_FFLAGS		0x0000000000001000ULL
+#define	ARG_MODE		0x0000000000002000ULL
+#define	ARG_DEV			0x0000000000004000ULL
+#define	ARG_ADDR		0x0000000000008000ULL
+#define	ARG_LEN			0x0000000000010000ULL
+#define	ARG_MASK		0x0000000000020000ULL
+#define	ARG_SIGNUM		0x0000000000040000ULL
+#define	ARG_LOGIN		0x0000000000080000ULL
+#define	ARG_SADDRINET		0x0000000000100000ULL
+#define	ARG_SADDRINET6		0x0000000000200000ULL
+#define	ARG_SADDRUNIX		0x0000000000400000ULL
+#define	ARG_TERMID_ADDR		0x0000000000400000ULL
+#define	ARG_UNUSED2		0x0000000001000000ULL
+#define	ARG_UPATH1		0x0000000002000000ULL
+#define	ARG_UPATH2		0x0000000004000000ULL
+#define	ARG_TEXT		0x0000000008000000ULL
+#define	ARG_VNODE1		0x0000000010000000ULL
+#define	ARG_VNODE2		0x0000000020000000ULL
+#define	ARG_SVIPC_CMD		0x0000000040000000ULL
+#define	ARG_SVIPC_PERM		0x0000000080000000ULL
+#define	ARG_SVIPC_ID		0x0000000100000000ULL
+#define	ARG_SVIPC_ADDR		0x0000000200000000ULL
+#define	ARG_GROUPSET		0x0000000400000000ULL
+#define	ARG_CMD			0x0000000800000000ULL
+#define	ARG_SOCKINFO		0x0000001000000000ULL
+#define	ARG_ASID		0x0000002000000000ULL
+#define	ARG_TERMID		0x0000004000000000ULL
+#define	ARG_AUDITON		0x0000008000000000ULL
+#define	ARG_VALUE		0x0000010000000000ULL
+#define	ARG_AMASK		0x0000020000000000ULL
+#define	ARG_CTLNAME		0x0000040000000000ULL
+#define	ARG_PROCESS		0x0000080000000000ULL
+#define	ARG_MACHPORT1		0x0000100000000000ULL
+#define	ARG_MACHPORT2		0x0000200000000000ULL
+#define	ARG_EXIT		0x0000400000000000ULL
+#define	ARG_IOVECSTR		0x0000800000000000ULL
+#define	ARG_ARGV		0x0001000000000000ULL
+#define	ARG_ENVV		0x0002000000000000ULL
+#define	ARG_ATFD1		0x0004000000000000ULL
+#define	ARG_ATFD2		0x0008000000000000ULL
+#define	ARG_RIGHTS		0x0010000000000000ULL
+#define	ARG_FCNTL_RIGHTS	0x0020000000000000ULL
+/* Gap:				0x0040000000000000ULL */
+#define	ARG_OBJUUID1		0x0080000000000000ULL
+#define	ARG_OBJUUID2		0x0100000000000000ULL
+#define	ARG_NONE		0x0000000000000000ULL
+#define	ARG_ALL			0xFFFFFFFFFFFFFFFFULL
+
+#define	RET_OBJUUID1		0x0000000000000001ULL
+#define	RET_OBJUUID2		0x0000000000000002ULL
+
+#define	ARG_IS_VALID(arg)	(args[1]->ar_valid_arg & (arg))
+#define	RET_IS_VALID(ret)	(args[1]->ar_valid_ret & (ret))
+
 
 /*
  * UUIDS fields:
@@ -91,11 +97,14 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 
 /* Convenience macro for printing audit fields */
 #define sprint_audit_string(flag, field, name) \
-	IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(stringof(this->record->field),"\"")):""
+	ARG_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(stringof(this->record->field),"\"")):""
 #define sprint_audit_int(flag, field, name) \
-	IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": "), lltostr(this->record->field)):""
-#define sprint_audit_uuid(flag, field, name) \
-	IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(uuidtostr((uintptr_t)&this->record->field),"\"")):""
+	ARG_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": "), lltostr(this->record->field)):""
+#define sprint_audit_ret_uuid(flag, field, name)			\
+	RET_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(uuidtostr((uintptr_t)&this->record->field),"\"")):""
+#define sprint_audit_arg_uuid(flag, field, name)			\
+	ARG_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(uuidtostr((uintptr_t)&this->record->field),"\"")):""
+
 
 
 /*
@@ -172,7 +181,7 @@ audit::aue_futimes*:commit
     && (args[1]->ar_retval >= 0)
 #endif
 #if !AUDIT_ANON_MMAP
-    && IS_VALID(ARG_FD) && (args[1]->ar_arg_fd != -1)
+    && ARG_IS_VALID(ARG_FD) && (args[1]->ar_arg_fd != -1)
 #endif
 #if !AUDIT_SSH_MORE
     && ((execname != "sshd") || ((execname == "sshd") &&
@@ -183,11 +192,13 @@ audit::aue_futimes*:commit
     this->record = (struct audit_record*) arg1;
     printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"subjuuid\": \"%U\"", comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, this->record->ar_subj_comm, this->record->ar_subj_uuid);
     printf("%s",
-	sprint_audit_uuid(ARG_PROCUUID, ar_arg_procuuid, procuuid));
+	sprint_audit_arg_uuid(ARG_OBJUUID1, ar_arg_objuuid1, arg_objuuid1));
     printf("%s",
-	sprint_audit_uuid(ARG_OBJUUID1, ar_arg_objuuid1, objuuid1));
+	sprint_audit_arg_uuid(ARG_OBJUUID2, ar_arg_objuuid2, arg_objuuid2));
     printf("%s",
-	sprint_audit_uuid(ARG_OBJUUID2, ar_arg_objuuid1, objuuid2));
+	sprint_audit_ret_uuid(RET_OBJUUID1, ar_ret_objuuid1, ret_objuuid1));
+    printf("%s",
+	sprint_audit_ret_uuid(RET_OBJUUID2, ar_ret_objuuid1, ret_objuuid2));
     printf("%s",
 	sprint_audit_int(ARG_PID, ar_arg_pid, arg_pid));
     printf("%s",
@@ -226,21 +237,21 @@ audit::aue_futimes*:commit
 	sprint_audit_int(ARG_SIGNUM, ar_arg_signum, signum));
 
     printf("%s",
-	IS_VALID(ARG_SADDRINET)?
+	ARG_IS_VALID(ARG_SADDRINET)?
 	strjoin(", \"address\": \"", strjoin(
 	    inet_ntop(af_inet,(void*)&((struct sockaddr_in*) &this->record->ar_arg_sockaddr)->sin_addr), "\""))
-	:IS_VALID(ARG_SADDRINET6)?
+	:ARG_IS_VALID(ARG_SADDRINET6)?
 	strjoin(", \"address\": \"", strjoin(
 	    inet_ntoa6(&((struct sockaddr_in6*) &this->record->ar_arg_sockaddr)->sin6_addr), "\""))
-	:IS_VALID(ARG_SADDRUNIX)?
+	:ARG_IS_VALID(ARG_SADDRUNIX)?
 	strjoin(", \"address\": \"", strjoin(
 		((struct sockaddr_un*) &this->record->ar_arg_sockaddr)->sun_path, "\""))
 	:"");
 
     printf("%s",
-	IS_VALID(ARG_SADDRINET)?
+	ARG_IS_VALID(ARG_SADDRINET)?
 	strjoin(", \"port\": ", lltostr(ntohs(((struct sockaddr_in*) &this->record->ar_arg_sockaddr)->sin_port)))
-        :IS_VALID(ARG_SADDRINET6)?
+        :ARG_IS_VALID(ARG_SADDRINET6)?
 	strjoin(", \"port\": ", lltostr(ntohs(((struct sockaddr_in6*) &this->record->ar_arg_sockaddr)->sin6_port)))
 	: "");
 
