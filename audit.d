@@ -10,7 +10,7 @@ inline int af_inet = 2 /*AF_INET*/;
 inline int af_inet6 = 28 /*AF_INET6*/;
 
 /* Options to enable/disable instrumentation */
-#define AUDIT_PRINT_VALID_FLAGS 1
+#define AUDIT_PRINT_VALID_FLAGS 0
 #define AUDIT_ALL_CALLS 0
 #define AUDIT_FAILED_CALLS 0
 #define AUDIT_ANON_MMAP 0
