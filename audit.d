@@ -10,6 +10,7 @@ inline int af_inet = 2 /*AF_INET*/;
 inline int af_inet6 = 28 /*AF_INET6*/;
 
 /* Options to enable/disable instrumentation */
+#define AUDIT_PRINT_VALID_FLAGS 1
 #define AUDIT_ALL_CALLS 0
 #define AUDIT_FAILED_CALLS 0
 #define AUDIT_ANON_MMAP 0
@@ -97,13 +98,13 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 
 /* Convenience macro for printing audit fields */
 #define sprint_audit_string(flag, field, name) \
-	ARG_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(stringof(this->record->field),"\"")):""
+	ARG_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(stringof(args[1]->field),"\"")):""
 #define sprint_audit_int(flag, field, name) \
-	ARG_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": "), lltostr(this->record->field)):""
+	ARG_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": "), lltostr(args[1]->field)):""
 #define sprint_audit_ret_uuid(flag, field, name)			\
-	RET_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(uuidtostr((uintptr_t)&this->record->field),"\"")):""
+	RET_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(uuidtostr((uintptr_t)&args[1]->field),"\"")):""
 #define sprint_audit_arg_uuid(flag, field, name)			\
-	ARG_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(uuidtostr((uintptr_t)&this->record->field),"\"")):""
+	ARG_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(uuidtostr((uintptr_t)&args[1]->field),"\"")):""
 
 
 
@@ -125,8 +126,6 @@ END {
 /* Filter on processes for read/write/mmap */
 #define proc_filter_rw (pid != $pid) && (execname != "sshd") && \
 	(execname != "tmux") && (execname != "moused")
-
-/* XXX: Conditionally print UUIDs */
 
 #if AUDIT_ALL_CALLS
 audit::aue_*:commit
@@ -181,7 +180,7 @@ audit::aue_futimes*:commit
     && (args[1]->ar_retval >= 0)
 #endif
 #if !AUDIT_ANON_MMAP
-    && ARG_IS_VALID(ARG_FD) && (args[1]->ar_arg_fd != -1)
+    && (args[1]->ar_arg_fd != -1)
 #endif
 #if !AUDIT_SSH_MORE
     && ((execname != "sshd") || ((execname == "sshd") &&
@@ -189,8 +188,7 @@ audit::aue_futimes*:commit
 #endif
 /
 {
-    this->record = (struct audit_record*) arg1;
-    printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"subjuuid\": \"%U\"", comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, this->record->ar_subj_comm, this->record->ar_subj_uuid);
+    printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"subjuuid\": \"%U\"", comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, args[1]->ar_subj_comm, args[1]->ar_subj_uuid);
     printf("%s",
 	sprint_audit_arg_uuid(ARG_OBJUUID1, ar_arg_objuuid1, arg_objuuid1));
     printf("%s",
@@ -239,24 +237,28 @@ audit::aue_futimes*:commit
     printf("%s",
 	ARG_IS_VALID(ARG_SADDRINET)?
 	strjoin(", \"address\": \"", strjoin(
-	    inet_ntop(af_inet,(void*)&((struct sockaddr_in*) &this->record->ar_arg_sockaddr)->sin_addr), "\""))
+	    inet_ntop(af_inet,(void*)&((struct sockaddr_in*) &args[1]->ar_arg_sockaddr)->sin_addr), "\""))
 	:ARG_IS_VALID(ARG_SADDRINET6)?
 	strjoin(", \"address\": \"", strjoin(
-	    inet_ntoa6(&((struct sockaddr_in6*) &this->record->ar_arg_sockaddr)->sin6_addr), "\""))
+	    inet_ntoa6(&((struct sockaddr_in6*) &args[1]->ar_arg_sockaddr)->sin6_addr), "\""))
 	:ARG_IS_VALID(ARG_SADDRUNIX)?
 	strjoin(", \"address\": \"", strjoin(
-		((struct sockaddr_un*) &this->record->ar_arg_sockaddr)->sun_path, "\""))
+		((struct sockaddr_un*) &args[1]->ar_arg_sockaddr)->sun_path, "\""))
 	:"");
 
     printf("%s",
 	ARG_IS_VALID(ARG_SADDRINET)?
-	strjoin(", \"port\": ", lltostr(ntohs(((struct sockaddr_in*) &this->record->ar_arg_sockaddr)->sin_port)))
+	strjoin(", \"port\": ", lltostr(ntohs(((struct sockaddr_in*) &args[1]->ar_arg_sockaddr)->sin_port)))
         :ARG_IS_VALID(ARG_SADDRINET6)?
-	strjoin(", \"port\": ", lltostr(ntohs(((struct sockaddr_in6*) &this->record->ar_arg_sockaddr)->sin6_port)))
+	strjoin(", \"port\": ", lltostr(ntohs(((struct sockaddr_in6*) &args[1]->ar_arg_sockaddr)->sin6_port)))
 	: "");
 
-    printf(", \"retval\": %d", this->record->ar_retval);
-    printf(", \"errno\": %d", this->record->ar_errno);
+#if AUDIT_PRINT_VALID_FLAGS
+    printf(", \"valid_arg\": 0x%016x, \"valid_ret\": 0x%016x",
+	    args[1]->ar_valid_arg, args[1]->ar_valid_ret);
+#endif
+    printf(", \"retval\": %d", args[1]->ar_retval);
+    printf(", \"errno\": %d", args[1]->ar_errno);
 
     printf("}\n");
     comma=",";
