@@ -13,7 +13,7 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 #define AUDIT_ALL_CALLS 0
 #define AUDIT_FAILED_CALLS 0
 #define AUDIT_ANON_MMAP 0
-#define AUDIT_SSH_WRITES 0
+#define AUDIT_SSH_MORE 0
 
 /* FROM security/audit/audit_private.h
  *
@@ -94,6 +94,9 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 	IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(stringof(this->record->field),"\"")):""
 #define sprint_audit_int(flag, field, name) \
 	IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": "), lltostr(this->record->field)):""
+#define sprint_audit_uuid(flag, field, name) \
+	IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(uuidtostr((uintptr_t)&this->record->field),"\"")):""
+
 
 /*
  * BEGIN and END probes
@@ -171,16 +174,20 @@ audit::aue_futimes*:commit
 #if !AUDIT_ANON_MMAP
     && IS_VALID(ARG_FD) && (args[1]->ar_arg_fd != -1)
 #endif
-#if !AUDIT_SSH_WRITES
+#if !AUDIT_SSH_MORE
     && ((execname != "sshd") || ((execname == "sshd") &&
 	(probefunc != "aue_read") && (probefunc != "aue_write") && (probefunc != "aue_mmap")))
 #endif
 /
 {
     this->record = (struct audit_record*) arg1;
-    printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\"", comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, this->record->ar_subj_comm);
-    printf(", \"subjuuid\": \"%U\", \"procuuid\": \"%U\", \"obj1uuid\": \"%U\", \"obj2uuid\": \"%U\"", args[1]->ar_subj_uuid, args[1]->ar_arg_procuuid, args[1]->ar_arg_objuuid1, args[1]->ar_arg_objuuid2);
-
+    printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"subjuuid\": \"%U\"", comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, this->record->ar_subj_comm, this->record->ar_subj_uuid);
+    printf("%s",
+	sprint_audit_uuid(ARG_PROCUUID, ar_arg_procuuid, procuuid));
+    printf("%s",
+	sprint_audit_uuid(ARG_OBJUUID1, ar_arg_objuuid1, objuuid1));
+    printf("%s",
+	sprint_audit_uuid(ARG_OBJUUID2, ar_arg_objuuid1, objuuid2));
     printf("%s",
 	sprint_audit_int(ARG_PID, ar_arg_pid, arg_pid));
     printf("%s",
