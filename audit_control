@@ -4,9 +4,10 @@
 #
 dir:/var/audit
 dist:off
-flags:lo,aa,ex,fc,fr,fd,all
+flags:
+naflags:lo
+policy:cnt
+qsize:10000
 minfree:5
-naflags:lo,aa,ex,fc,fr,fd,all
-policy:cnt,argv,arge
-filesz:20M
-expire-after:
+filesz:2M
+expire-after:10M
