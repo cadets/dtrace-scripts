@@ -11,7 +11,9 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 
 /* Options to enable/disable instrumentation */
 #define AUDIT_PRINT_LOGIN 1
+#define AUDIT_PRINT_CMD 0
 #define AUDIT_PRINT_VALID_FLAGS 0
+#define AUDIT_PRINT_ERRNO 0
 #define AUDIT_ALL_CALLS 0
 #define AUDIT_FAILED_CALLS 0
 #define AUDIT_ANON_MMAP 0
@@ -238,6 +240,10 @@ audit::aue_futimes*:commit
 	sprint_audit_int(ARG_LEN, ar_arg_len, len));
     printf("%s",
 	sprint_audit_int(ARG_SIGNUM, ar_arg_signum, signum));
+#if AUDIT_PRINT_CMD
+    printf("%s",
+	sprint_audit_int(ARG_CMD, ar_arg_cmd, cmd));
+#endif
 
     printf("%s",
 	ARG_IS_VALID(ARG_SADDRINET)?
@@ -263,7 +269,9 @@ audit::aue_futimes*:commit
 	    args[1]->ar_valid_arg, args[1]->ar_valid_ret);
 #endif
     printf(", \"retval\": %d", args[1]->ar_retval);
+#if AUDIT_PRINT_ERRNO
     printf(", \"errno\": %d", args[1]->ar_errno);
+#endif
 
     printf("}\n");
     comma=",";
