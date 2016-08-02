@@ -91,14 +91,6 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 #define	ARG_IS_VALID(arg)	(args[1]->ar_valid_arg & (arg))
 #define	RET_IS_VALID(ret)	(args[1]->ar_valid_ret & (ret))
 
-
-/*
- * UUIDS fields:
- * ar_subj_uuid: always the UUID of the process performing/authorizing the system call
- *  ar_arg_procuuid: UUID of a target process being operated on, or in the case of fork(2), the child process
- * ar_arg_objuuid1 and ar_arg_objuuid2: the optional first (and further optional second) UUIDs of other types of objects being operated on. Almost always vnode/pipe/socket UUIDs, but in the future presumably also other IPC types
- */
-
 /* Convenience macro for printing audit fields */
 #define sprint_audit_string(flag, field, name) \
 	ARG_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(stringof(args[1]->field),"\"")):""
@@ -108,8 +100,6 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 	RET_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(uuidtostr((uintptr_t)&args[1]->field),"\"")):""
 #define sprint_audit_arg_uuid(flag, field, name)			\
 	ARG_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(uuidtostr((uintptr_t)&args[1]->field),"\"")):""
-
-
 
 /*
  * BEGIN and END probes
@@ -191,7 +181,7 @@ audit::aue_futimes*:commit
 #endif
 /
 {
-    printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"subjuuid\": \"%U\"", comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, args[1]->ar_subj_comm, args[1]->ar_subj_uuid);
+    printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"subjprocuuid\": \"%U\", \"subjthruuid\": \"%U\"", comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, args[1]->ar_subj_comm, args[1]->ar_subj_proc_uuid, args[1]->ar_subj_thr_uuid);
     printf("%s",
 	sprint_audit_arg_uuid(ARG_OBJUUID1, ar_arg_objuuid1, arg_objuuid1));
     printf("%s",
