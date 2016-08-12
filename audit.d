@@ -266,3 +266,29 @@ audit::aue_futimes*:commit
     printf("}\n");
     comma=",";
 }
+
+tcp:::accept-established
+/(pid != $pid)
+#if !AUDIT_SSH_MORE
+    && ((execname != "sshd") || ((execname == "sshd") &&
+	(probefunc != "aue_read") && (probefunc != "aue_write") && (probefunc != "aue_mmap")))
+#endif
+/
+{
+	printf("Accepted connection from %s:%d\n",
+	       args[2]->ip_saddr,
+	       args[4]->tcp_sport)
+}
+
+tcp:::connect-established
+/(pid != $pid)
+#if !AUDIT_SSH_MORE
+    && ((execname != "sshd") || ((execname == "sshd") &&
+	(probefunc != "aue_read") && (probefunc != "aue_write") && (probefunc != "aue_mmap")))
+#endif
+/
+{
+	printf("Established connection to %s:%d\n",
+		       args[2]->ip_saddr,
+		       args[4]->tcp_sport)
+}
