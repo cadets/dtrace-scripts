@@ -275,9 +275,12 @@ tcp:::accept-established
 #endif
 /
 {
-	printf("Accepted connection from %s:%d\n",
-	       args[2]->ip_saddr,
-	       args[4]->tcp_sport)
+	printf("TCP accepted a connection from %s:%d to %s:%d on UUID %U\n",
+		       args[2]->ip_saddr,
+		       args[4]->tcp_sport,
+		       args[2]->ip_daddr,
+		       args[4]->tcp_dport,
+		       ((struct tcpcb *)args[3]->tcps_addr)->t_inpcb->inp_socket->so_uuid);
 }
 
 tcp:::connect-established
@@ -288,7 +291,42 @@ tcp:::connect-established
 #endif
 /
 {
-	printf("Established connection to %s:%d\n",
+	printf("TCP established a connection to %s:%d from %s:%d on UUID %U\n",
 		       args[2]->ip_saddr,
-		       args[4]->tcp_sport)
+		       args[4]->tcp_sport,
+		       args[2]->ip_daddr,
+		       args[4]->tcp_dport,
+		       ((struct tcpcb *)args[3]->tcps_addr)->t_inpcb->inp_socket->so_uuid);
+}
+
+udp:::send
+/(pid != $pid)
+#if !AUDIT_SSH_MORE
+    && ((execname != "sshd") || ((execname == "sshd") &&
+	(probefunc != "aue_read") && (probefunc != "aue_write") && (probefunc != "aue_mmap")))
+#endif
+/
+{
+	printf("UDP sent data to %s:%d from %s:%d on UUID %U\n",
+		       args[2]->ip_daddr,
+		       args[4]->udp_dport,
+		       args[2]->ip_saddr,
+		       args[4]->udp_sport,
+		       ((struct inpcb *)args[3]->udps_addr)->inp_socket->so_uuid);
+}
+
+udp:::receive
+/(pid != $pid)
+#if !AUDIT_SSH_MORE
+    && ((execname != "sshd") || ((execname == "sshd") &&
+	(probefunc != "aue_read") && (probefunc != "aue_write") && (probefunc != "aue_mmap")))
+#endif
+/
+{
+	printf("UDP received data from %s:%d to %s:%d on UUID %U\n",
+		       args[2]->ip_saddr,
+		       args[4]->udp_sport,
+		       args[2]->ip_daddr,
+		       args[4]->udp_dport,
+		       ((struct inpcb *)args[3]->udps_addr)->inp_socket->so_uuid);
 }
