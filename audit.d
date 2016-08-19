@@ -18,6 +18,7 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 #define AUDIT_FAILED_CALLS 0
 #define AUDIT_ANON_MMAP 0
 #define AUDIT_SSH_MORE 0
+#define FILTER_PYTHON 1
 
 /* FROM security/audit/audit_private.h
  *
@@ -169,6 +170,9 @@ audit::aue_lutimes:commit,
 audit::aue_futimes*:commit
 #endif
 /(pid != $pid)
+#if FILTER_PYTHON
+&& (execname != "python3.4")
+#endif
 #if !AUDIT_FAILED_CALLS
     && (args[1]->ar_retval >= 0)
 #endif
