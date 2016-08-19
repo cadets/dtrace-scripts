@@ -234,6 +234,8 @@ audit::aue_futimes*:commit
 	sprint_audit_int(ARG_LEN, ar_arg_len, len));
     printf("%s",
 	sprint_audit_int(ARG_SIGNUM, ar_arg_signum, signum));
+    printf("%s",
+	probefunc=="aue_execve"?strjoin(",\"cmdLine\": \"", strjoin(curpsinfo->pr_psargs, "\"")):"");
 #if AUDIT_PRINT_CMD
     printf("%s",
 	sprint_audit_string(ARG_CMD, ar_arg_cmd, cmd));
