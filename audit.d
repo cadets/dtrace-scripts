@@ -11,7 +11,7 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 
 /* Options to enable/disable instrumentation */
 #define AUDIT_PRINT_LOGIN 1
-#define AUDIT_PRINT_CMD 0
+#define AUDIT_PRINT_CMD 1
 #define AUDIT_PRINT_VALID_FLAGS 0
 #define AUDIT_PRINT_ERRNO 0
 #define AUDIT_ALL_CALLS 0
@@ -236,7 +236,7 @@ audit::aue_futimes*:commit
 	sprint_audit_int(ARG_SIGNUM, ar_arg_signum, signum));
 #if AUDIT_PRINT_CMD
     printf("%s",
-	sprint_audit_int(ARG_CMD, ar_arg_cmd, cmd));
+	sprint_audit_string(ARG_CMD, ar_arg_cmd, cmd));
 #endif
 
     printf("%s",
