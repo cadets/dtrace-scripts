@@ -204,6 +204,12 @@ audit::aue_futimes*:commit
 	sprint_audit_int(ARG_SUID, ar_arg_suid, arg_suid));
     printf("%s",
 	sprint_audit_int(ARG_UID, ar_arg_uid, arg_uid));
+    printf("%s",
+	((probefunc=="aue_execve" || probefunc=="aue_exec" || probefunc=="aue_fexecve") && ((uintptr_t) curpsinfo) > 0)?strjoin(",\"cmdLine\": \"", strjoin(curpsinfo->pr_psargs, "\"")):"");
+/*
+    printf("%s",
+	(IS_VALID(ARG_FD) && probefunc=="aue_write")?strjoin(",\"path\": \"", strjoin(fds[args[1]->ar_arg_fd].fi_pathname, "\"")):"");
+*/
 #if AUDIT_PRINT_LOGIN
     printf("%s",
 	sprint_audit_string(ARG_LOGIN, ar_arg_login, login));
