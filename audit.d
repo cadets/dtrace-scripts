@@ -1,7 +1,7 @@
 #!/usr/sbin/dtrace -Cs
 
 #pragma D option quiet
-#pragma D option switchrate=10hz
+#pragma D option switchrate=1000hz
 #pragma D option dynvarsize=16m
 #pragma D option bufsize=16m
 #pragma D option strsize=1024
