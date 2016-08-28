@@ -18,7 +18,9 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 #define AUDIT_FAILED_CALLS 0
 #define AUDIT_ANON_MMAP 0
 #define AUDIT_SSH_MORE 0
-#define FILTER_PYTHON 1
+#define AUDIT_PRINT_PATH 1
+#define FILTER_PYTHON 0
+#define FILTER_UID    1
 
 /* FROM security/audit/audit_private.h
  *
@@ -173,6 +175,9 @@ audit::aue_futimes*:commit
 #if FILTER_PYTHON
 && (execname != "python3.4")
 #endif
+#if FILTER_UID
+&& (uid != 1002)
+#endif
 #if !AUDIT_FAILED_CALLS
     && (args[1]->ar_retval >= 0)
 #endif
@@ -204,12 +209,6 @@ audit::aue_futimes*:commit
 	sprint_audit_int(ARG_SUID, ar_arg_suid, arg_suid));
     printf("%s",
 	sprint_audit_int(ARG_UID, ar_arg_uid, arg_uid));
-    printf("%s",
-	((probefunc=="aue_execve" || probefunc=="aue_exec" || probefunc=="aue_fexecve") && ((uintptr_t) curpsinfo) > 0)?strjoin(",\"cmdLine\": \"", strjoin(curpsinfo->pr_psargs, "\"")):"");
-/*
-    printf("%s",
-	(IS_VALID(ARG_FD) && probefunc=="aue_write")?strjoin(",\"path\": \"", strjoin(fds[args[1]->ar_arg_fd].fi_pathname, "\"")):"");
-*/
 #if AUDIT_PRINT_LOGIN
     printf("%s",
 	sprint_audit_string(ARG_LOGIN, ar_arg_login, login));
@@ -240,12 +239,6 @@ audit::aue_futimes*:commit
 	sprint_audit_int(ARG_LEN, ar_arg_len, len));
     printf("%s",
 	sprint_audit_int(ARG_SIGNUM, ar_arg_signum, signum));
-    printf("%s",
-	probefunc=="aue_execve"?strjoin(",\"cmdLine\": \"", strjoin(curpsinfo->pr_psargs, "\"")):"");
-#if AUDIT_PRINT_CMD
-    printf("%s",
-	sprint_audit_string(ARG_CMD, ar_arg_cmd, cmd));
-#endif
 
     printf("%s",
 	ARG_IS_VALID(ARG_SADDRINET)?
@@ -273,6 +266,22 @@ audit::aue_futimes*:commit
     printf(", \"retval\": %d", args[1]->ar_retval);
 #if AUDIT_PRINT_ERRNO
     printf(", \"errno\": %d", args[1]->ar_errno);
+#endif
+
+#if AUDIT_PRINT_CMD
+    printf("%s",
+	sprint_audit_string(ARG_CMD, ar_arg_cmd, cmd));
+    printf("%s",
+	((probefunc=="aue_execve" || probefunc=="aue_exec" || probefunc=="aue_fexecve") && ((uintptr_t) curpsinfo) > 0) ? ", \"cmdline\": \"" : "");
+    printf("%S",
+	((probefunc=="aue_execve" || probefunc=="aue_exec" || probefunc=="aue_fexecve") && ((uintptr_t) curpsinfo) > 0) ? curpsinfo->pr_psargs : "");
+    printf("%s",
+	((probefunc=="aue_execve" || probefunc=="aue_exec" || probefunc=="aue_fexecve") && ((uintptr_t) curpsinfo) > 0) ? "\"" : "");
+#endif
+
+#if AUDIT_PRINT_PATH
+    printf("%s",
+	(ARG_IS_VALID(ARG_FD) && (probefunc=="aue_write" || probefunc == "aue_pwrite" || probefunc == "aue_writev" || probefunc == "aue_prwitev" || probefunc=="aue_read" || probefunc == "aue_pread" || probefunc == "aue_readv" || probefunc == "aue_preadv" || probefunc == "aue_mmap"))?strjoin(",\"fdpath\": \"", strjoin(fds[args[1]->ar_arg_fd].fi_pathname, "\"")):"");
 #endif
 
     printf("}\n");
