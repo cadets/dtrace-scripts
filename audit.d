@@ -1,4 +1,4 @@
-#!/usr/sbin/dtrace -Cs
+#!/usr/sbin/dtrace -wCs
 
 #pragma D option quiet
 #pragma D option switchrate=1000hz
