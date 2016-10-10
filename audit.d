@@ -198,7 +198,7 @@ audit::aue_futimes*:commit
     printf("%s",
 	sprint_audit_ret_uuid(RET_OBJUUID1, ar_ret_objuuid1, ret_objuuid1));
     printf("%s",
-	sprint_audit_ret_uuid(RET_OBJUUID2, ar_ret_objuuid1, ret_objuuid2));
+	sprint_audit_ret_uuid(RET_OBJUUID2, ar_ret_objuuid2, ret_objuuid2));
     printf("%s",
 	sprint_audit_int(ARG_PID, ar_arg_pid, arg_pid));
     printf("%s",
