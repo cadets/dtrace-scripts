@@ -100,10 +100,13 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 	ARG_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(stringof(args[1]->field),"\"")):""
 #define sprint_audit_int(flag, field, name) \
 	ARG_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": "), lltostr(args[1]->field)):""
+#define sprint_audit_ret_int(flag, field, name) \
+	RET_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": "), lltostr(args[1]->field)):""
 #define sprint_audit_ret_uuid(flag, field, name)			\
 	RET_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(uuidtostr((uintptr_t)&args[1]->field),"\"")):""
 #define sprint_audit_arg_uuid(flag, field, name)			\
 	ARG_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(uuidtostr((uintptr_t)&args[1]->field),"\"")):""
+
 
 /*
  * BEGIN and END probes
@@ -146,8 +149,7 @@ audit::aue_setuid:commit,audit::aue_setgid:commit,audit::aue_seteuid:commit,audi
 audit::aue_setreuid:commit,audit::aue_setregid:commit,
 audit::aue_setresuid:commit,audit::aue_setresgid:commit,
 audit::aue_pipe*:commit,
-audit::aue_recvfrom:commit,
-audit::aue_recvmsg:commit,
+audit::aue_recv*:commit,
 audit::aue_chdir:commit,
 audit::aue_fchdir:commit,
 audit::aue_chmod:commit,
@@ -162,8 +164,7 @@ audit::aue_link*:commit,
 audit::aue_lseek:commit,
 audit::aue_mkdir*:commit,
 audit::aue_rmdir:commit,
-audit::aue_sendto:commit,
-audit::aue_sendmsg:commit,
+audit::aue_send*:commit,
 audit::aue_socket:commit,
 audit::aue_socketpair:commit,
 audit::aue_symlink*:commit,
@@ -201,7 +202,7 @@ audit::aue_futimes*:commit
     printf("%s",
 	sprint_audit_ret_uuid(RET_OBJUUID2, ar_ret_objuuid2, ret_objuuid2));
     printf("%s",
-	sprint_audit_int(RET_MSGID, ar_ret_msgid, ret_msgid));
+	sprint_audit_ret_int(RET_MSGID, ar_ret_msgid, ret_msgid));
     printf("%s",
 	sprint_audit_int(ARG_PID, ar_arg_pid, arg_pid));
     printf("%s",
