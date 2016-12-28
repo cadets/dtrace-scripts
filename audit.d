@@ -85,12 +85,17 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 /* Gap:				0x0040000000000000ULL */
 #define	ARG_OBJUUID1		0x0080000000000000ULL
 #define	ARG_OBJUUID2		0x0100000000000000ULL
+#define	ARG_SVIPC_WHICH		0x0200000000000000ULL
+#define	ARG_METAIO		0x0400000000000000ULL
 #define	ARG_NONE		0x0000000000000000ULL
 #define	ARG_ALL			0xFFFFFFFFFFFFFFFFULL
 
 #define	RET_OBJUUID1		0x0000000000000001ULL
 #define	RET_OBJUUID2		0x0000000000000002ULL
 #define	RET_MSGID		0x0000000000000004ULL
+#define	RET_SVIPC_ID		0x0000000000000008ULL
+#define	RET_FD1			0x0000000000000010ULL
+#define	RET_FD2			0x0000000000000020ULL
 
 #define	ARG_IS_VALID(arg)	(args[1]->ar_valid_arg & (arg))
 #define	RET_IS_VALID(ret)	(args[1]->ar_valid_ret & (ret))
@@ -197,6 +202,8 @@ audit::aue_futimes*:commit
 	sprint_audit_arg_uuid(ARG_OBJUUID1, ar_arg_objuuid1, arg_objuuid1));
     printf("%s",
 	sprint_audit_arg_uuid(ARG_OBJUUID2, ar_arg_objuuid2, arg_objuuid2));
+    printf("%s",
+	sprint_audit_arg_uuid(ARG_METAIO, ar_arg_metaio.mio_uuid, arg_miouuid));
     printf("%s",
 	sprint_audit_ret_uuid(RET_OBJUUID1, ar_ret_objuuid1, ret_objuuid1));
     printf("%s",
