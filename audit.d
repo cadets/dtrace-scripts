@@ -96,6 +96,7 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 #define	RET_SVIPC_ID		0x0000000000000008ULL
 #define	RET_FD1			0x0000000000000010ULL
 #define	RET_FD2			0x0000000000000020ULL
+#define	RET_METAIO		0x0000000000000040ULL
 
 #define	ARG_IS_VALID(arg)	(args[1]->ar_valid_arg & (arg))
 #define	RET_IS_VALID(ret)	(args[1]->ar_valid_ret & (ret))
@@ -208,6 +209,8 @@ audit::aue_futimes*:commit
 	sprint_audit_ret_uuid(RET_OBJUUID1, ar_ret_objuuid1, ret_objuuid1));
     printf("%s",
 	sprint_audit_ret_uuid(RET_OBJUUID2, ar_ret_objuuid2, ret_objuuid2));
+    printf("%s",
+	sprint_audit_ret_uuid(RET_METAIO, ar_ret_metaio.mio_uuid, ret_miouuid));
     printf("%s",
 	sprint_audit_ret_int(RET_MSGID, ar_ret_msgid, ret_msgid));
     printf("%s",
