@@ -149,11 +149,13 @@ audit::aue_*read:commit,audit::aue_readl:commit,
 audit::aue_*readv:commit,audit::aue_readvl:commit,
 audit::aue_write:commit,audit::aue_pwrite:commit,audit::aue_writev:commit,audit::aue_writel:commit,audit::aue_writevl:commit,
 audit::aue_mmap:commit,
+audit::aue_kill:commit,
 audit::aue_connect*:commit,
 audit::aue_accept*:commit,
 audit::aue_setuid:commit,audit::aue_setgid:commit,audit::aue_seteuid:commit,audit::aue_setegid:commit,
 audit::aue_setreuid:commit,audit::aue_setregid:commit,
 audit::aue_setresuid:commit,audit::aue_setresgid:commit,
+audit::aue_setlogin:commit,
 audit::aue_pipe*:commit,
 audit::aue_recv*:commit,
 audit::aue_chdir:commit,
@@ -198,7 +200,7 @@ audit::aue_futimes*:commit
 #endif
 /
 {
-    printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"exec\": \"%s\", \"subjprocuuid\": \"%U\", \"subjthruuid\": \"%U\"", comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, args[1]->ar_subj_comm, args[1]->ar_subj_proc_uuid, args[1]->ar_subj_thr_uuid);
+    printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"cpu_id\": %d, \"exec\": \"%s\", \"subjprocuuid\": \"%U\", \"subjthruuid\": \"%U\"", comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, args[1]->ar_subj_cpuid, args[1]->ar_subj_comm, args[1]->ar_subj_proc_uuid, args[1]->ar_subj_thr_uuid);
     printf("%s",
 	sprint_audit_arg_uuid(ARG_OBJUUID1, ar_arg_objuuid1, arg_objuuid1));
     printf("%s",
