@@ -137,6 +137,7 @@ END {
 audit::aue_*:commit
 #else
 audit::aue_fork:commit,audit::aue_vfork:commit,audit::aue_rfork:commit,
+audit::aue_pdfork:commit,
 audit::aue_fexecve:commit,audit::aue_exec:commit,audit::aue_execve:commit,
 audit::aue_exit:commit,
 audit::aue_open_*:commit,audit::aue_openat_*:commit,
@@ -149,6 +150,7 @@ audit::aue_*read:commit,audit::aue_readl:commit,
 audit::aue_*readv:commit,audit::aue_readvl:commit,
 audit::aue_write:commit,audit::aue_pwrite:commit,audit::aue_writev:commit,audit::aue_writel:commit,audit::aue_writevl:commit,
 audit::aue_mmap:commit,
+audit::aue_pdkill:commit,
 audit::aue_kill:commit,
 audit::aue_connect*:commit,
 audit::aue_accept*:commit,
