@@ -288,7 +288,9 @@ audit::aue_futimes*:commit
 
 #if AUDIT_PRINT_CMD
     printf("%s",
-	sprint_audit_string(ARG_CMD, ar_arg_cmd, cmd));
+	(probefunc=="aue_fcntl")
+	? sprint_audit_int(ARG_CMD, ar_arg_cmd, fcntl_cmd)
+	: sprint_audit_string(ARG_CMD, ar_arg_cmd, cmd));
     printf("%s",
 	((probefunc=="aue_execve" || probefunc=="aue_exec" || probefunc=="aue_fexecve") && ((uintptr_t) curpsinfo) > 0) ? ", \"cmdline\": \"" : "");
     printf("%S",
