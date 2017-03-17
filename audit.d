@@ -202,7 +202,15 @@ audit::aue_futimes*:commit
 #endif
 /
 {
-    printf("%s {\"event\": \"%s:%s:%s:\", \"time\": %d, \"pid\": %d, \"ppid\": %d, \"tid\": %d, \"uid\": %d, \"cpu_id\": %d, \"exec\": \"%s\", \"subjprocuuid\": \"%U\", \"subjthruuid\": \"%U\"", comma, probeprov, probemod, probefunc, walltimestamp, pid, ppid, tid, uid, args[1]->ar_subj_cpuid, args[1]->ar_subj_comm, args[1]->ar_subj_proc_uuid, args[1]->ar_subj_thr_uuid);
+    printf("%s {\"event\": \"%s:%s:%s:\"", comma, probeprov, probemod, probefunc);
+    printf(", \"time\": %d", walltimestamp);
+    printf(", \"pid\": %d", pid);
+    printf(", \"ppid\": %d",ppid);
+    printf(", \"tid\": %d", tid);
+    printf(", \"uid\": %d", uid);
+    printf(", \"exec\": \"%s\"", args[1]->ar_subj_comm);
+    printf(", \"subjprocuuid\": \"%U\"", args[1]->ar_subj_proc_uuid);
+    printf(", \"subjthruuid\": \"%U\"", args[1]->ar_subj_thr_uuid);
     printf("%s",
 	sprint_audit_arg_uuid(ARG_OBJUUID1, ar_arg_objuuid1, arg_objuuid1));
     printf("%s",
