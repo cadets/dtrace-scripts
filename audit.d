@@ -260,6 +260,10 @@ audit::aue_futimes*:commit
     printf("%s",
 	sprint_audit_int(ARG_ATFD2, ar_arg_atfd2, atfd2));
     printf("%s",
+	sprint_audit_int(RET_FD1, ar_ret_fd1, ret_fd1));
+    printf("%s",
+	sprint_audit_int(RET_FD2, ar_ret_fd2, ret_fd2));
+    printf("%s",
 	sprint_audit_int(ARG_MODE, ar_arg_mode, mode));
     printf("%s",
 	sprint_audit_int(ARG_LEN, ar_arg_len, len));
