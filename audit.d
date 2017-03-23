@@ -208,6 +208,7 @@ audit::aue_futimes*:commit
     printf(", \"ppid\": %d",ppid);
     printf(", \"tid\": %d", tid);
     printf(", \"uid\": %d", uid);
+    printf(", \"cpu_id\": %d", args[1]->ar_subj_cpuid);
     printf(", \"exec\": \"%s\"", args[1]->ar_subj_comm);
     printf(", \"subjprocuuid\": \"%U\"", args[1]->ar_subj_proc_uuid);
     printf(", \"subjthruuid\": \"%U\"", args[1]->ar_subj_thr_uuid);
