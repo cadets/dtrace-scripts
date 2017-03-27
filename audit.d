@@ -133,7 +133,6 @@ END {
 #define proc_filter_rw (pid != $pid) && (execname != "sshd") && \
 	(execname != "tmux") && (execname != "moused")
 
-#if 0
 #if AUDIT_ALL_CALLS
 audit::aue_*:commit
 #else
@@ -321,36 +320,3 @@ audit::aue_futimes*:commit
     printf("}\n");
     comma=",";
 }
-#endif
-tcp:::accept-established
-/(pid != $pid)
-#if !AUDIT_SSH_MORE
-    && ((execname != "sshd") || ((execname == "sshd") &&
-	(probefunc != "aue_read") && (probefunc != "aue_write") && (probefunc != "aue_mmap")))
-#endif
-/
-{
-	printf("Accept connection from %s:%d to %s:%d on UUID %U\n",
-		       args[2]->ip_saddr,
-		       args[4]->tcp_sport,
-		       args[2]->ip_daddr,
-		       args[4]->tcp_dport,
-		       ((struct tcpcb *)args[3]->tcps_addr)->t_inpcb->inp_socket->so_uuid);
-}
-
-tcp:::connect-established
-/(pid != $pid)
-#if !AUDIT_SSH_MORE
-    && ((execname != "sshd") || ((execname == "sshd") &&
-	(probefunc != "aue_read") && (probefunc != "aue_write") && (probefunc != "aue_mmap")))
-#endif
-/
-{
-	printf("Established connection to %s:%d from %s:%d on UUID %U\n",
-		       args[2]->ip_saddr,
-		       args[4]->tcp_sport,
-		       args[2]->ip_daddr,
-		       args[4]->tcp_dport,
-		       ((struct tcpcb *)args[3]->tcps_addr)->t_inpcb->inp_socket->so_uuid);
-}
-
