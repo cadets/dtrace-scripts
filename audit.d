@@ -102,16 +102,16 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 #define	RET_IS_VALID(ret)	(args[1]->ar_valid_ret & (ret))
 
 /* Convenience macro for printing audit fields */
-#define sprint_audit_string(flag, field, name) \
+#define sprint_audit_arg_string(flag, field, name) \
 	ARG_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(stringof(args[1]->field),"\"")):""
-#define sprint_audit_int(flag, field, name) \
+#define sprint_audit_arg_int(flag, field, name) \
 	ARG_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": "), lltostr(args[1]->field)):""
-#define sprint_audit_ret_int(flag, field, name) \
+#define sprint_audit_arg_uuid(flag, field, name)			\
+	ARG_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(uuidtostr((uintptr_t)&args[1]->field),"\"")):""
+#define sprint_audit_ret_int(flag, field, name)				\
 	RET_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": "), lltostr(args[1]->field)):""
 #define sprint_audit_ret_uuid(flag, field, name)			\
 	RET_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(uuidtostr((uintptr_t)&args[1]->field),"\"")):""
-#define sprint_audit_arg_uuid(flag, field, name)			\
-	ARG_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(uuidtostr((uintptr_t)&args[1]->field),"\"")):""
 
 
 /*
@@ -209,6 +209,7 @@ audit::aue_futimes*:commit
     printf(", \"ppid\": %d",ppid);
     printf(", \"tid\": %d", tid);
     printf(", \"uid\": %d", uid);
+    printf(", \"cpu_id\": %d", args[1]->ar_subj_cpuid);
     printf(", \"exec\": \"%s\"", args[1]->ar_subj_comm);
     printf(", \"subjprocuuid\": \"%U\"", args[1]->ar_subj_proc_uuid);
     printf(", \"subjthruuid\": \"%U\"", args[1]->ar_subj_thr_uuid);
@@ -227,49 +228,49 @@ audit::aue_futimes*:commit
     printf("%s",
 	sprint_audit_ret_int(RET_MSGID, ar_ret_msgid, ret_msgid));
     printf("%s",
-	sprint_audit_int(ARG_PID, ar_arg_pid, arg_pid));
+	sprint_audit_arg_int(ARG_PID, ar_arg_pid, arg_pid));
     printf("%s",
-	sprint_audit_int(ARG_EUID, ar_arg_euid, arg_euid));
+	sprint_audit_arg_int(ARG_EUID, ar_arg_euid, arg_euid));
     printf("%s",
-	sprint_audit_int(ARG_RUID, ar_arg_ruid, arg_ruid));
+	sprint_audit_arg_int(ARG_RUID, ar_arg_ruid, arg_ruid));
     printf("%s",
-	sprint_audit_int(ARG_SUID, ar_arg_suid, arg_suid));
+	sprint_audit_arg_int(ARG_SUID, ar_arg_suid, arg_suid));
     printf("%s",
-	sprint_audit_int(ARG_UID, ar_arg_uid, arg_uid));
+	sprint_audit_arg_int(ARG_UID, ar_arg_uid, arg_uid));
 #if AUDIT_PRINT_LOGIN
     printf("%s",
-	sprint_audit_string(ARG_LOGIN, ar_arg_login, login));
+	sprint_audit_arg_string(ARG_LOGIN, ar_arg_login, login));
 #endif
     printf("%s",
-	sprint_audit_int(ARG_EGID, ar_arg_egid, arg_egid));
+	sprint_audit_arg_int(ARG_EGID, ar_arg_egid, arg_egid));
     printf("%s",
-	sprint_audit_int(ARG_RGID, ar_arg_rgid, arg_rgid));
+	sprint_audit_arg_int(ARG_RGID, ar_arg_rgid, arg_rgid));
     printf("%s",
-	sprint_audit_int(ARG_SGID, ar_arg_sgid, arg_sgid));
+	sprint_audit_arg_int(ARG_SGID, ar_arg_sgid, arg_sgid));
     printf("%s",
-	sprint_audit_int(ARG_GID, ar_arg_gid, arg_gid));
+	sprint_audit_arg_int(ARG_GID, ar_arg_gid, arg_gid));
     printf("%s",
-	sprint_audit_string(ARG_UPATH1, ar_arg_upath1, upath1));
+	sprint_audit_arg_string(ARG_UPATH1, ar_arg_upath1, upath1));
     printf("%s",
-	sprint_audit_string(ARG_UPATH2, ar_arg_upath2, upath2));
+	sprint_audit_arg_string(ARG_UPATH2, ar_arg_upath2, upath2));
     printf("%s",
-	sprint_audit_int(ARG_FFLAGS, ar_arg_fflags, flags));
+	sprint_audit_arg_int(ARG_FFLAGS, ar_arg_fflags, flags));
     printf("%s",
-	sprint_audit_int(ARG_FD, ar_arg_fd, fd));
+	sprint_audit_arg_int(ARG_FD, ar_arg_fd, fd));
     printf("%s",
-	sprint_audit_int(ARG_ATFD1, ar_arg_atfd1, atfd1));
+	sprint_audit_arg_int(ARG_ATFD1, ar_arg_atfd1, atfd1));
     printf("%s",
-	sprint_audit_int(ARG_ATFD2, ar_arg_atfd2, atfd2));
+	sprint_audit_arg_int(ARG_ATFD2, ar_arg_atfd2, atfd2));
     printf("%s",
-	sprint_audit_int(RET_FD1, ar_ret_fd1, ret_fd1));
+	sprint_audit_ret_int(RET_FD1, ar_ret_fd1, ret_fd1));
     printf("%s",
-	sprint_audit_int(RET_FD2, ar_ret_fd2, ret_fd2));
+	sprint_audit_ret_int(RET_FD2, ar_ret_fd2, ret_fd2));
     printf("%s",
-	sprint_audit_int(ARG_MODE, ar_arg_mode, mode));
+	sprint_audit_arg_int(ARG_MODE, ar_arg_mode, mode));
     printf("%s",
-	sprint_audit_int(ARG_LEN, ar_arg_len, len));
+	sprint_audit_arg_int(ARG_LEN, ar_arg_len, len));
     printf("%s",
-	sprint_audit_int(ARG_SIGNUM, ar_arg_signum, signum));
+	sprint_audit_arg_int(ARG_SIGNUM, ar_arg_signum, signum));
 
     printf("%s",
 	ARG_IS_VALID(ARG_SADDRINET)?
@@ -302,8 +303,8 @@ audit::aue_futimes*:commit
 #if AUDIT_PRINT_CMD
     printf("%s",
 	(probefunc=="aue_fcntl")
-	? sprint_audit_int(ARG_CMD, ar_arg_cmd, fcntl_cmd)
-	: sprint_audit_string(ARG_CMD, ar_arg_cmd, cmd));
+	? sprint_audit_arg_int(ARG_CMD, ar_arg_cmd, fcntl_cmd)
+	: sprint_audit_arg_string(ARG_CMD, ar_arg_cmd, cmd));
     printf("%s",
 	((probefunc=="aue_execve" || probefunc=="aue_exec" || probefunc=="aue_fexecve") && ((uintptr_t) curpsinfo) > 0) ? ", \"cmdline\": \"" : "");
     printf("%S",
