@@ -19,6 +19,7 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 #define AUDIT_ANON_MMAP 0
 #define AUDIT_SSH_MORE 0
 #define AUDIT_PRINT_PATH 1
+#define AUDIT_IPC_CALLS 1
 #define FILTER_PYTHON 0
 #define FILTER_UID    1
 
@@ -181,7 +182,18 @@ audit::aue_symlink*:commit,
 audit::aue_umask:commit,
 audit::aue_utimes:commit,
 audit::aue_lutimes:commit,
-audit::aue_futimes*:commit
+audit::aue_futimes*:commit,
+#if AUDIT_IPC_CALLS
+audit::aue_msgctl:commit, audit::aue_msgget:commit, audit::aue_msgsnd:commit, audit::aue_msgrcv:commit,
+audit::aue_shmat:commit, audit::aue_shmctl:commit, audit::aue_shmdt:commit, audit::aue_shmget:commit, audit::aue_shmopen:commit, audit::aue_shmunlink:commit,
+audit::aue_semget:commit, audit::aue_semop:commit, audit::aue_semclose:commit, audit::aue_sempost:commit, audit::aue_semwait:commit, audit::aue_seminit:commit, audit::aue_semopen:commit, audit::aue_semctl:commit,
+audit::aue_semunlink:commit, audit::aue_semgetvalue:commit, audit::aue_semdestroy:commit,
+audit::aue_mq_open:commit,
+audit::aue_mq_setattr:commit, audit::aue_mq_timedreceive:commit, audit::aue_mq_timedsend:commit,
+audit::aue_mq_notify:commit, audit::aue_mq_unlink:commit,
+audit::aue_posix_openpt:commit,
+#endif
+audit::aue_null:commit
 #endif
 /(pid != $pid)
 #if FILTER_PYTHON
