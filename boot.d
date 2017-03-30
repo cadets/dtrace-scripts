@@ -59,6 +59,8 @@ proc:kernel::exec
     printf(", \"tid\": %d", tid);
     printf(", \"uid\": %d", uid);
     printf(", \"exec\": \"%s\"", stringof(args[0]));
+    printf(", \"procuuid\": \"%U\"", curthread->td_proc->p_uuid);
+    printf(", \"thruuid\": \"%U\"", curthread->td_uuid);
     printf("}\n");
     comma=",";
 }
@@ -80,6 +82,8 @@ vfs:namei:lookup:entry
     printf(", \"tid\": %d", tid);
     printf(", \"uid\": %d", uid);
     printf(", \"lookup\": \"%s\"", stringof(args[1]));
+    printf(", \"procuuid\": \"%U\"", curthread->td_proc->p_uuid);
+    printf(", \"thruuid\": \"%U\"", curthread->td_uuid);
     printf("}\n");
     comma=",";
 }
