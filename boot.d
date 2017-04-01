@@ -75,7 +75,7 @@ vfs:namei:lookup:entry
 #endif
 /
 {
-    printf("%s {\"event\": \"%s:%s:%s:\"", comma, probeprov, probemod, probefunc);
+    printf("%s {\"event\": \"%s:%s:%s:entry\"", comma, probeprov, probemod, probefunc);
     printf(", \"time\": %d", walltimestamp);
     printf(", \"pid\": %d", pid);
     printf(", \"ppid\": %d",ppid);
@@ -84,6 +84,30 @@ vfs:namei:lookup:entry
     printf(", \"lookup\": \"%s\"", stringof(args[1]));
     printf(", \"procuuid\": \"%U\"", curthread->td_proc->p_uuid);
     printf(", \"thruuid\": \"%U\"", curthread->td_uuid);
+    printf(", \"vnodeuuid\": \"%U\"", args[0]->v_uuid);
+    printf("}\n");
+    comma=",";
+}
+
+vfs:namei:lookup:return
+/(pid != $pid)
+#if FILTER_PYTHON
+&& (execname != "python3.4")
+#endif
+#if FILTER_UID
+&& (uid != 1002)
+#endif
+/
+{
+    printf("%s {\"event\": \"%s:%s:%s:return\"", comma, probeprov, probemod, probefunc);
+    printf(", \"time\": %d", walltimestamp);
+    printf(", \"pid\": %d", pid);
+    printf(", \"ppid\": %d",ppid);
+    printf(", \"tid\": %d", tid);
+    printf(", \"uid\": %d", uid);
+    printf(", \"procuuid\": \"%U\"", curthread->td_proc->p_uuid);
+    printf(", \"thruuid\": \"%U\"", curthread->td_uuid);
+    printf(", \"vnodeuuid\": \"%U\"", args[1]->v_uuid);
     printf("}\n");
     comma=",";
 }
