@@ -97,6 +97,7 @@ vfs:namei:lookup:return
 #if FILTER_UID
 && (uid != 1002)
 #endif
+&& args[1] != NULL
 /
 {
     printf("%s {\"event\": \"%s:%s:%s:return\"", comma, probeprov, probemod, probefunc);
