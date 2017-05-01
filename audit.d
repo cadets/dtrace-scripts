@@ -123,14 +123,14 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 #define PROT_EXEC 0x04
 
 inline string prot_table[int32_t prot] =
-    prot == PROT_NONE ?		"[PROT_NONE]" :
-    prot == (PROT_READ) ? 	"[PROT_READ]" :
-    prot == (PROT_WRITE) ? 	"[PROT_WRITE]" :
-    prot == (PROT_EXEC) ? 	"[PROT_EXEC]" :
-    prot == (PROT_READ | PROT_WRITE) ? "[PROT_READ, PROT_WRITE]" :
-    prot == (PROT_READ | PROT_EXEC) ? "[PROT_READ, PROT_EXEC]" :
-    prot == (PROT_WRITE | PROT_EXEC) ? "[PROT_WRITE, PROT_EXEC]" :
-    prot == (PROT_READ | PROT_WRITE | PROT_EXEC) ? "[PROT_READ, PROT_WRITE, PROT_EXEC]" :
+    prot == PROT_NONE ?		"[\"PROT_NONE\"]" :
+    prot == (PROT_READ) ? 	"[\"PROT_READ\"]" :
+    prot == (PROT_WRITE) ? 	"[\"PROT_WRITE\"]" :
+    prot == (PROT_EXEC) ? 	"[\"PROT_EXEC\"]" :
+    prot == (PROT_READ | PROT_WRITE) ? "[\"PROT_READ\", \"PROT_WRITE\"]" :
+    prot == (PROT_READ | PROT_EXEC) ? "[\"PROT_READ\", \"PROT_EXEC\"]" :
+    prot == (PROT_WRITE | PROT_EXEC) ? "[\"PROT_WRITE\", \"PROT_EXEC\"]" :
+    prot == (PROT_READ | PROT_WRITE | PROT_EXEC) ? "[\"PROT_READ\", \"PROT_WRITE\", \"PROT_EXEC\"]" :
     "";
 
 /*
@@ -356,12 +356,12 @@ audit::aue_null:commit
 #endif
 
 #if AUDIT_MPROTECT
-    printf("%s", (probefunc == "aue_mprotect") ? ", \"flags\": "  : "");
+    printf("%s", (probefunc == "aue_mprotect") ? ", \"arg_mem_flags\": "  : "");
     printf("%s", (probefunc == "aue_mprotect") ? prot_table[mprotect_flags] : "");
 #endif
 
 #if AUDIT_MMAP
-    printf("%s", (probefunc == "aue_mmap") ? ", \"flags\": " : "");
+    printf("%s", (probefunc == "aue_mmap") ? ", \"arg_mem_flags\": " : "");
     printf("%s", (probefunc == "aue_mmap") ? prot_table[mmap_flags] : "");
 #endif
 
