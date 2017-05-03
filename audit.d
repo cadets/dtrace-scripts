@@ -19,7 +19,7 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 #define AUDIT_ANON_MMAP 0
 #define AUDIT_SSH_MORE 0
 #define AUDIT_PRINT_PATH 1
-#define AUDIT_IPC_CALLS 0
+#define AUDIT_IPC_CALLS 1
 #define AUDIT_MPROTECT 1
 #define AUDIT_MMAP 1
 #define FILTER_PYTHON 0
@@ -131,7 +131,7 @@ inline string prot_table[int32_t prot] =
     prot == (PROT_READ | PROT_EXEC) ? "[\"PROT_READ\", \"PROT_EXEC\"]" :
     prot == (PROT_WRITE | PROT_EXEC) ? "[\"PROT_WRITE\", \"PROT_EXEC\"]" :
     prot == (PROT_READ | PROT_WRITE | PROT_EXEC) ? "[\"PROT_READ\", \"PROT_WRITE\", \"PROT_EXEC\"]" :
-    "";
+    strjoin("[\"", strjoin(lltostr(prot), "\"]"));
 
 /*
  * BEGIN and END probes
