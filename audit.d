@@ -109,6 +109,8 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 	ARG_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(stringof(args[1]->field),"\"")):""
 #define sprint_audit_arg_int(flag, field, name) \
 	ARG_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": "), lltostr(args[1]->field)):""
+#define sprint_audit_arg_ugid(flag, field, name) \
+	ARG_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": "), lltostr((int32_t)args[1]->field)):""
 #define sprint_audit_arg_uuid(flag, field, name)			\
 	ARG_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(uuidtostr((uintptr_t)&args[1]->field),"\"")):""
 #define sprint_audit_ret_int(flag, field, name)				\
@@ -267,25 +269,25 @@ audit::aue_null:commit
     printf("%s",
 	sprint_audit_arg_int(ARG_PID, ar_arg_pid, arg_pid));
     printf("%s",
-	sprint_audit_arg_int(ARG_EUID, ar_arg_euid, arg_euid));
+	sprint_audit_arg_ugid(ARG_EUID, ar_arg_euid, arg_euid));
     printf("%s",
-	sprint_audit_arg_int(ARG_RUID, ar_arg_ruid, arg_ruid));
+	sprint_audit_arg_ugid(ARG_RUID, ar_arg_ruid, arg_ruid));
     printf("%s",
-	sprint_audit_arg_int(ARG_SUID, ar_arg_suid, arg_suid));
+	sprint_audit_arg_ugid(ARG_SUID, ar_arg_suid, arg_suid));
     printf("%s",
-	sprint_audit_arg_int(ARG_UID, ar_arg_uid, arg_uid));
+	sprint_audit_arg_ugid(ARG_UID, ar_arg_uid, arg_uid));
 #if AUDIT_PRINT_LOGIN
     printf("%s",
 	sprint_audit_arg_string(ARG_LOGIN, ar_arg_login, login));
 #endif
     printf("%s",
-	sprint_audit_arg_int(ARG_EGID, ar_arg_egid, arg_egid));
+	sprint_audit_arg_ugid(ARG_EGID, ar_arg_egid, arg_egid));
     printf("%s",
-	sprint_audit_arg_int(ARG_RGID, ar_arg_rgid, arg_rgid));
+	sprint_audit_arg_ugid(ARG_RGID, ar_arg_rgid, arg_rgid));
     printf("%s",
-	sprint_audit_arg_int(ARG_SGID, ar_arg_sgid, arg_sgid));
+	sprint_audit_arg_ugid(ARG_SGID, ar_arg_sgid, arg_sgid));
     printf("%s",
-	sprint_audit_arg_int(ARG_GID, ar_arg_gid, arg_gid));
+	sprint_audit_arg_ugid(ARG_GID, ar_arg_gid, arg_gid));
     printf("%s",
 	sprint_audit_arg_string(ARG_UPATH1, ar_arg_upath1, upath1));
     printf("%s",
