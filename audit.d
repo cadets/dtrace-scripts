@@ -20,6 +20,8 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 #define AUDIT_SSH_MORE 0
 #define AUDIT_PRINT_PATH 1
 #define AUDIT_IPC_CALLS 1
+#define AUDIT_MPROTECT 1
+#define AUDIT_MMAP 1
 #define FILTER_PYTHON 0
 #define FILTER_UID    1
 
@@ -115,10 +117,28 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 	RET_IS_VALID(flag)?strjoin( strjoin(strjoin(", \"", #name), "\": \""), strjoin(uuidtostr((uintptr_t)&args[1]->field),"\"")):""
 
 
+#define PROT_NONE 0x00
+#define PROT_READ 0x01
+#define PROT_WRITE 0x02
+#define PROT_EXEC 0x04
+
+inline string prot_table[int32_t prot] =
+    prot == PROT_NONE ?		"[\"PROT_NONE\"]" :
+    prot == (PROT_READ) ? 	"[\"PROT_READ\"]" :
+    prot == (PROT_WRITE) ? 	"[\"PROT_WRITE\"]" :
+    prot == (PROT_EXEC) ? 	"[\"PROT_EXEC\"]" :
+    prot == (PROT_READ | PROT_WRITE) ? "[\"PROT_READ\", \"PROT_WRITE\"]" :
+    prot == (PROT_READ | PROT_EXEC) ? "[\"PROT_READ\", \"PROT_EXEC\"]" :
+    prot == (PROT_WRITE | PROT_EXEC) ? "[\"PROT_WRITE\", \"PROT_EXEC\"]" :
+    prot == (PROT_READ | PROT_WRITE | PROT_EXEC) ? "[\"PROT_READ\", \"PROT_WRITE\", \"PROT_EXEC\"]" :
+    strjoin("[\"", strjoin(lltostr(prot), "\"]"));
+
 /*
  * BEGIN and END probes
  */
 BEGIN {
+    mprotect_flags = 0;
+    mmap_flags = 0;
     printf("[\n");
     comma=" ";
 }
@@ -193,6 +213,12 @@ audit::aue_mq_setattr:commit, audit::aue_mq_timedreceive:commit, audit::aue_mq_t
 audit::aue_mq_notify:commit, audit::aue_mq_unlink:commit,
 audit::aue_posix_openpt:commit,
 #endif
+#if AUDIT_MPROTECT
+audit::aue_mprotect:commit,
+#endif
+#if AUDIT_MMAP
+audit::aue_mmap:commit,
+#endif
 audit::aue_null:commit
 #endif
 /(pid != $pid)
@@ -201,6 +227,7 @@ audit::aue_null:commit
 #endif
 #if FILTER_UID
 && (uid != 1002)
+&& (uid != 1003)
 #endif
 #if !AUDIT_FAILED_CALLS
     && (args[1]->ar_retval >= 0)
@@ -329,6 +356,26 @@ audit::aue_null:commit
 	(ARG_IS_VALID(ARG_FD) && (probefunc=="aue_write" || probefunc == "aue_pwrite" || probefunc == "aue_writev" || probefunc == "aue_prwitev" || probefunc=="aue_read" || probefunc == "aue_pread" || probefunc == "aue_readv" || probefunc == "aue_preadv" || probefunc == "aue_mmap"))?strjoin(", \"fdpath\": \"", strjoin(fds[args[1]->ar_arg_fd].fi_pathname, "\"")):"");
 #endif
 
+#if AUDIT_MPROTECT
+    printf("%s", (probefunc == "aue_mprotect") ? ", \"arg_mem_flags\": "  : "");
+    printf("%s", (probefunc == "aue_mprotect") ? prot_table[mprotect_flags] : "");
+#endif
+
+#if AUDIT_MMAP
+    printf("%s", (probefunc == "aue_mmap") ? ", \"arg_mem_flags\": " : "");
+    printf("%s", (probefunc == "aue_mmap") ? prot_table[mmap_flags] : "");
+#endif
+
     printf("}\n");
     comma=",";
+}
+
+syscall::mprotect:entry
+{
+	mprotect_flags = arg2;
+}
+
+syscall::mmap:entry
+{
+	mmap_flags = arg2;
 }
