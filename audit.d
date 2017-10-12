@@ -243,6 +243,7 @@ audit::aue_null:commit
 /
 {
     printf("%s {\"event\": \"%s:%s:%s:\"", comma, probeprov, probemod, probefunc);
+    printf(", \"host\": \"%s\"", $0);
     printf(", \"time\": %d", walltimestamp);
     printf(", \"pid\": %d", pid);
     printf(", \"ppid\": %d",ppid);
@@ -379,4 +380,29 @@ syscall::mprotect:entry
 syscall::mmap:entry
 {
 	mmap_flags = arg2;
+}
+
+fbt::syncache_expand:entry {
+    printf("%s {\"event\": \"%s:%s:%s:\"", comma, probeprov, probemod, probefunc);
+    printf(", \"host\": \"%s\"", $0);
+    printf(", \"time\": %d", walltimestamp);
+    printf(", \"so_uuid\": \"%s\"", uuidtostr((uintptr_t)&(*args[3])->so_uuid));
+    printf(", \"lport\": %d", ntohs(args[0]->inc_ie.ie_lport));
+    printf(", \"fport\": %d", ntohs(args[0]->inc_ie.ie_fport));
+    printf(", \"laddr\": \"%s\"", inet_ntop(af_inet, (void *) &args[0]->inc_ie.ie_dependladdr.ie46_local.ia46_addr4));
+    printf(", \"faddr\": \"%s\"", inet_ntop(af_inet, (void *) &args[0]->inc_ie.ie_dependfaddr.ie46_foreign.ia46_addr4));
+    printf("}\n");
+    comma=",";
+}
+fbt::cc_conn_init:entry {
+    printf("%s {\"event\": \"%s:%s:%s:\"", comma, probeprov, probemod, probefunc);
+    printf(", \"host\": \"%s\"", $0);
+    printf(", \"time\": %d", walltimestamp);
+    printf(", \"so_uuid\": \"%s\"", uuidtostr((uintptr_t)&args[0]->t_inpcb->inp_socket->so_uuid));
+    printf(", \"lport\": %d", ntohs(args[0]->t_inpcb->inp_inc.inc_ie.ie_lport));
+    printf(", \"fport\": %d", ntohs(args[0]->t_inpcb->inp_inc.inc_ie.ie_fport));
+    printf(", \"laddr\": \"%s\"", inet_ntop(af_inet, (void *) &args[0]->t_inpcb->inp_inc.inc_ie.ie_dependladdr.ie46_local.ia46_addr4));
+    printf(", \"faddr\": \"%s\"", inet_ntop(af_inet, (void *) &args[0]->t_inpcb->inp_inc.inc_ie.ie_dependfaddr.ie46_foreign.ia46_addr4));
+    printf("}\n");
+    comma=",";
 }
