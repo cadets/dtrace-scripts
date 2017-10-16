@@ -228,7 +228,7 @@ audit::aue_null:commit
 && (execname != "python3.4")
 #endif
 #if FILTER_UID
-&& (uid != 1002)
+&& (uid != 1003)
 #endif
 #if !AUDIT_FAILED_CALLS
     && (args[1]->ar_retval >= 0)
