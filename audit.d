@@ -17,7 +17,7 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 #define AUDIT_ALL_CALLS 0
 #define AUDIT_FAILED_CALLS 0
 #define AUDIT_ANON_MMAP 0
-#define AUDIT_SSH_MORE 1
+#define AUDIT_SSH_MORE 0
 #define AUDIT_PRINT_PATH 1
 #define AUDIT_IPC_CALLS 1
 #define AUDIT_MPROTECT 1
