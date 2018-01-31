@@ -386,6 +386,7 @@ fbt::syncache_expand:entry {
     printf("%s {\"event\": \"%s:%s:%s:\"", comma, probeprov, probemod, probefunc);
     printf(", \"host\": \"%s\"", $1);
     printf(", \"time\": %d", walltimestamp);
+    printf(", \"tid\": %d", tid);
     printf(", \"so_uuid\": \"%s\"", uuidtostr((uintptr_t)&(*args[3])->so_uuid));
     printf(", \"lport\": %d", ntohs(args[0]->inc_ie.ie_lport));
     printf(", \"fport\": %d", ntohs(args[0]->inc_ie.ie_fport));
@@ -398,11 +399,46 @@ fbt::cc_conn_init:entry {
     printf("%s {\"event\": \"%s:%s:%s:\"", comma, probeprov, probemod, probefunc);
     printf(", \"host\": \"%s\"", $1);
     printf(", \"time\": %d", walltimestamp);
+    printf(", \"tid\": %d", tid);
     printf(", \"so_uuid\": \"%s\"", uuidtostr((uintptr_t)&args[0]->t_inpcb->inp_socket->so_uuid));
     printf(", \"lport\": %d", ntohs(args[0]->t_inpcb->inp_inc.inc_ie.ie_lport));
     printf(", \"fport\": %d", ntohs(args[0]->t_inpcb->inp_inc.inc_ie.ie_fport));
     printf(", \"laddr\": \"%s\"", inet_ntop(af_inet, (void *) &args[0]->t_inpcb->inp_inc.inc_ie.ie_dependladdr.ie46_local.ia46_addr4));
     printf(", \"faddr\": \"%s\"", inet_ntop(af_inet, (void *) &args[0]->t_inpcb->inp_inc.inc_ie.ie_dependfaddr.ie46_foreign.ia46_addr4));
+    printf("}\n");
+    comma=",";
+}
+
+udp:::send
+/(pid != $pid)
+/
+{
+    printf("%s {\"event\": \"%s:%s:%s:\"", comma, probeprov, probemod, probefunc);
+    printf(", \"host\": \"%s\"", $1);
+    printf(", \"time\": %d", walltimestamp);
+    printf(", \"tid\": %d", tid);
+    printf(", \"so_uuid\": \"%s\"", uuidtostr((uintptr_t)&(((struct inpcb *)args[3]->udps_addr)->inp_socket->so_uuid)));
+    printf(", \"lport\": %d", args[4]->udp_sport);
+    printf(", \"fport\": %d", args[4]->udp_dport);
+    printf(", \"laddr\": \"%s\"", args[2]->ip_saddr);
+    printf(", \"faddr\": \"%s\"", args[2]->ip_daddr);
+    printf("}\n");
+    comma=",";
+}
+
+udp:::receive
+/(pid != $pid)
+/
+{
+    printf("%s {\"event\": \"%s:%s:%s:\"", comma, probeprov, probemod, probefunc);
+    printf(", \"host\": \"%s\"", $1);
+    printf(", \"time\": %d", walltimestamp);
+    printf(", \"tid\": %d", tid);
+    printf(", \"so_uuid\": \"%s\"", uuidtostr((uintptr_t)&(((struct inpcb *)args[3]->udps_addr)->inp_socket->so_uuid)));
+    printf(", \"lport\": %d", args[4]->udp_dport);
+    printf(", \"fport\": %d", args[4]->udp_sport);
+    printf(", \"laddr\": \"%s\"", args[2]->ip_daddr);
+    printf(", \"faddr\": \"%s\"", args[2]->ip_saddr);
     printf("}\n");
     comma=",";
 }
