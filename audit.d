@@ -231,7 +231,7 @@ audit::aue_null:commit
 && (uid != 1003)
 #endif
 #if !AUDIT_FAILED_CALLS
-    && (args[1]->ar_retval >= 0)
+    && ((args[1]->ar_retval >= 0) || (args[1]->ar_errno == -2 && ((probefunc == "aue_execve") || (probefunc == "aue_exec") || (probefunc == "aue_fexecve"))))
 #endif
 #if !AUDIT_ANON_MMAP
     && (args[1]->ar_arg_fd != -1)
@@ -382,11 +382,21 @@ syscall::mmap:entry
 	mmap_flags = arg2;
 }
 
-fbt::syncache_expand:entry {
+fbt::syncache_expand:entry
+/(pid != $pid)
+#if FILTER_PYTHON
+&& (execname != "python3.4")
+#endif
+#if FILTER_UID
+&& (uid != 1003)
+#endif
+/
+{
     printf("%s {\"event\": \"%s:%s:%s:\"", comma, probeprov, probemod, probefunc);
     printf(", \"host\": \"%s\"", $1);
     printf(", \"time\": %d", walltimestamp);
     printf(", \"tid\": %d", tid);
+    printf(", \"uid\": %d", uid);
     printf(", \"so_uuid\": \"%s\"", uuidtostr((uintptr_t)&(*args[3])->so_uuid));
     printf(", \"lport\": %d", ntohs(args[0]->inc_ie.ie_lport));
     printf(", \"fport\": %d", ntohs(args[0]->inc_ie.ie_fport));
@@ -395,11 +405,21 @@ fbt::syncache_expand:entry {
     printf("}\n");
     comma=",";
 }
-fbt::cc_conn_init:entry {
+fbt::cc_conn_init:entry
+/(pid != $pid)
+#if FILTER_PYTHON
+&& (execname != "python3.4")
+#endif
+#if FILTER_UID
+&& (uid != 1003)
+#endif
+/
+{
     printf("%s {\"event\": \"%s:%s:%s:\"", comma, probeprov, probemod, probefunc);
     printf(", \"host\": \"%s\"", $1);
     printf(", \"time\": %d", walltimestamp);
     printf(", \"tid\": %d", tid);
+    printf(", \"uid\": %d", uid);
     printf(", \"so_uuid\": \"%s\"", uuidtostr((uintptr_t)&args[0]->t_inpcb->inp_socket->so_uuid));
     printf(", \"lport\": %d", ntohs(args[0]->t_inpcb->inp_inc.inc_ie.ie_lport));
     printf(", \"fport\": %d", ntohs(args[0]->t_inpcb->inp_inc.inc_ie.ie_fport));
@@ -411,12 +431,19 @@ fbt::cc_conn_init:entry {
 
 udp:::send
 /(pid != $pid)
+#if FILTER_PYTHON
+&& (execname != "python3.4")
+#endif
+#if FILTER_UID
+&& (uid != 1003)
+#endif
 /
 {
     printf("%s {\"event\": \"%s:%s:%s:\"", comma, probeprov, probemod, probefunc);
     printf(", \"host\": \"%s\"", $1);
     printf(", \"time\": %d", walltimestamp);
     printf(", \"tid\": %d", tid);
+    printf(", \"uid\": %d", uid);
     printf(", \"so_uuid\": \"%s\"", uuidtostr((uintptr_t)&(((struct inpcb *)args[3]->udps_addr)->inp_socket->so_uuid)));
     printf(", \"lport\": %d", args[4]->udp_sport);
     printf(", \"fport\": %d", args[4]->udp_dport);
@@ -428,12 +455,19 @@ udp:::send
 
 udp:::receive
 /(pid != $pid)
+#if FILTER_PYTHON
+&& (execname != "python3.4")
+#endif
+#if FILTER_UID
+&& (uid != 1003)
+#endif
 /
 {
     printf("%s {\"event\": \"%s:%s:%s:\"", comma, probeprov, probemod, probefunc);
     printf(", \"host\": \"%s\"", $1);
     printf(", \"time\": %d", walltimestamp);
     printf(", \"tid\": %d", tid);
+    printf(", \"uid\": %d", uid);
     printf(", \"so_uuid\": \"%s\"", uuidtostr((uintptr_t)&(((struct inpcb *)args[3]->udps_addr)->inp_socket->so_uuid)));
     printf(", \"lport\": %d", args[4]->udp_dport);
     printf(", \"fport\": %d", args[4]->udp_sport);
