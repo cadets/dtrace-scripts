@@ -122,8 +122,10 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 #define PROT_READ 0x01
 #define PROT_WRITE 0x02
 #define PROT_EXEC 0x04
+#define MAP_SHARED      0x0001
+#define MAP_PRIVATE     0x0002
 
-inline string prot_table[int32_t prot] =
+inline string mmap_prot_table[int32_t prot] =
     prot == PROT_NONE ?		"[\"PROT_NONE\"]" :
     prot == (PROT_READ) ? 	"[\"PROT_READ\"]" :
     prot == (PROT_WRITE) ? 	"[\"PROT_WRITE\"]" :
@@ -134,12 +136,18 @@ inline string prot_table[int32_t prot] =
     prot == (PROT_READ | PROT_WRITE | PROT_EXEC) ? "[\"PROT_READ\", \"PROT_WRITE\", \"PROT_EXEC\"]" :
     strjoin("[\"", strjoin(lltostr(prot), "\"]"));
 
+inline string mmap_sharing_table[int32_t flag] =
+    (flag & MAP_SHARED) == (MAP_SHARED) ? "[\"MAP_SHARED\"]" :
+    (flag & MAP_PRIVATE) == (MAP_PRIVATE) ? "[\"MAP_PRIVATE\"]" :
+    strjoin("[\"", strjoin(lltostr(flag), "\"]"));
+
 /*
  * BEGIN and END probes
  */
 BEGIN {
     mprotect_flags = 0;
     mmap_flags = 0;
+    mmap_sharing_flags = 0;
 }
 
 END {
@@ -351,12 +359,14 @@ audit::aue_null:commit
 
 #if AUDIT_MPROTECT
     printf("%s", (probefunc == "aue_mprotect") ? ", \"arg_mem_flags\": "  : "");
-    printf("%s", (probefunc == "aue_mprotect") ? prot_table[mprotect_flags] : "");
+    printf("%s", (probefunc == "aue_mprotect") ? mmap_prot_table[mprotect_flags] : "");
 #endif
 
 #if AUDIT_MMAP
     printf("%s", (probefunc == "aue_mmap") ? ", \"arg_mem_flags\": " : "");
-    printf("%s", (probefunc == "aue_mmap") ? prot_table[mmap_flags] : "");
+    printf("%s", (probefunc == "aue_mmap") ? mmap_prot_table[mmap_flags] : "");
+    printf("%s", (probefunc == "aue_mmap") ? ", \"arg_mem_other_flags\": " : "");
+    printf("%s", (probefunc == "aue_mmap") ? mmap_sharing_table[mmap_sharing_flags] : "");
 #endif
 
     printf("}\n");
@@ -370,6 +380,7 @@ syscall::mprotect:entry
 syscall::mmap:entry
 {
 	mmap_flags = arg2;
+	mmap_sharing_flags = arg3;
 }
 
 fbt::syncache_expand:entry
