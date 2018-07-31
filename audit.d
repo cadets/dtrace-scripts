@@ -141,12 +141,9 @@ inline string prot_table[int32_t prot] =
 BEGIN {
     mprotect_flags = 0;
     mmap_flags = 0;
-    printf("[\n");
-    comma=" ";
 }
 
 END {
-  printf("]\n");
 }
 
 /* XXX: proc_filter */
@@ -242,7 +239,7 @@ audit::aue_null:commit
 #endif
 /
 {
-    printf("%s {\"event\": \"%s:%s:%s:\"", comma, probeprov, probemod, probefunc);
+    printf("{\"event\": \"%s:%s:%s:\"", probeprov, probemod, probefunc);
     printf(", \"host\": \"%s\"", $1);
     printf(", \"time\": %d", walltimestamp);
     printf(", \"pid\": %d", pid);
@@ -369,7 +366,6 @@ audit::aue_null:commit
 #endif
 
     printf("}\n");
-    comma=",";
 }
 
 syscall::mprotect:entry
@@ -392,7 +388,7 @@ fbt::syncache_expand:entry
 #endif
 /
 {
-    printf("%s {\"event\": \"%s:%s:%s:\"", comma, probeprov, probemod, probefunc);
+    printf("{\"event\": \"%s:%s:%s:\"", probeprov, probemod, probefunc);
     printf(", \"host\": \"%s\"", $1);
     printf(", \"time\": %d", walltimestamp);
     printf(", \"tid\": %d", tid);
@@ -403,7 +399,6 @@ fbt::syncache_expand:entry
     printf(", \"laddr\": \"%s\"", inet_ntop(af_inet, (void *) &args[0]->inc_ie.ie_dependladdr.ie46_local.ia46_addr4));
     printf(", \"faddr\": \"%s\"", inet_ntop(af_inet, (void *) &args[0]->inc_ie.ie_dependfaddr.ie46_foreign.ia46_addr4));
     printf("}\n");
-    comma=",";
 }
 fbt::cc_conn_init:entry
 /(pid != $pid)
@@ -415,7 +410,7 @@ fbt::cc_conn_init:entry
 #endif
 /
 {
-    printf("%s {\"event\": \"%s:%s:%s:\"", comma, probeprov, probemod, probefunc);
+    printf("{\"event\": \"%s:%s:%s:\"", probeprov, probemod, probefunc);
     printf(", \"host\": \"%s\"", $1);
     printf(", \"time\": %d", walltimestamp);
     printf(", \"tid\": %d", tid);
@@ -426,7 +421,6 @@ fbt::cc_conn_init:entry
     printf(", \"laddr\": \"%s\"", inet_ntop(af_inet, (void *) &args[0]->t_inpcb->inp_inc.inc_ie.ie_dependladdr.ie46_local.ia46_addr4));
     printf(", \"faddr\": \"%s\"", inet_ntop(af_inet, (void *) &args[0]->t_inpcb->inp_inc.inc_ie.ie_dependfaddr.ie46_foreign.ia46_addr4));
     printf("}\n");
-    comma=",";
 }
 
 udp:::send
@@ -439,7 +433,7 @@ udp:::send
 #endif
 /
 {
-    printf("%s {\"event\": \"%s:%s:%s:\"", comma, probeprov, probemod, probefunc);
+    printf("{\"event\": \"%s:%s:%s:\"", probeprov, probemod, probefunc);
     printf(", \"host\": \"%s\"", $1);
     printf(", \"time\": %d", walltimestamp);
     printf(", \"tid\": %d", tid);
@@ -450,7 +444,6 @@ udp:::send
     printf(", \"laddr\": \"%s\"", args[2]->ip_saddr);
     printf(", \"faddr\": \"%s\"", args[2]->ip_daddr);
     printf("}\n");
-    comma=",";
 }
 
 udp:::receive
@@ -463,7 +456,7 @@ udp:::receive
 #endif
 /
 {
-    printf("%s {\"event\": \"%s:%s:%s:\"", comma, probeprov, probemod, probefunc);
+    printf("{\"event\": \"%s:%s:%s:\"", probeprov, probemod, probefunc);
     printf(", \"host\": \"%s\"", $1);
     printf(", \"time\": %d", walltimestamp);
     printf(", \"tid\": %d", tid);
@@ -474,5 +467,4 @@ udp:::receive
     printf(", \"laddr\": \"%s\"", args[2]->ip_daddr);
     printf(", \"faddr\": \"%s\"", args[2]->ip_saddr);
     printf("}\n");
-    comma=",";
 }
