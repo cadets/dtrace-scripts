@@ -4,7 +4,7 @@
 #pragma D option switchrate=1000hz
 #pragma D option dynvarsize=16m
 #pragma D option bufsize=64m
-#pragma D option strsize=4k
+#pragma D option strsize=512
 
 inline int af_inet = 2 /*AF_INET*/;
 inline int af_inet6 = 28 /*AF_INET6*/;
