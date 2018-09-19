@@ -22,6 +22,7 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 #define AUDIT_MPROTECT 1
 #define AUDIT_MMAP 1
 #define FILTER_PYTHON 0
+#define FILTER_DLOGD 1
 #define FILTER_UID    1
 
 /* FROM security/audit/audit_private.h
@@ -220,6 +221,9 @@ audit::aue_mmap:commit,
 audit::aue_null:commit
 #endif
 /(pid != $pid)
+#if FILTER_DLOGD
+&& (execname != "dlogd")
+#endif
 #if FILTER_PYTHON
 && (execname != "python3.4")
 #endif
@@ -374,6 +378,9 @@ syscall::mmap:entry
 
 fbt::syncache_expand:entry
 /(pid != $pid)
+#if FILTER_DLOGD
+&& (execname != "dlogd")
+#endif
 #if FILTER_PYTHON
 && (execname != "python3.4")
 #endif
@@ -396,6 +403,9 @@ fbt::syncache_expand:entry
 }
 fbt::cc_conn_init:entry
 /(pid != $pid)
+#if FILTER_DLOGD
+&& (execname != "dlogd")
+#endif
 #if FILTER_PYTHON
 && (execname != "python3.4")
 #endif
@@ -419,6 +429,9 @@ fbt::cc_conn_init:entry
 
 udp:::send
 /(pid != $pid)
+#if FILTER_DLOGD
+&& (execname != "dlogd")
+#endif
 #if FILTER_PYTHON
 && (execname != "python3.4")
 #endif
@@ -442,6 +455,9 @@ udp:::send
 
 udp:::receive
 /(pid != $pid)
+#if FILTER_DLOGD
+&& (execname != "dlogd")
+#endif
 #if FILTER_PYTHON
 && (execname != "python3.4")
 #endif
