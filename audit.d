@@ -149,6 +149,7 @@ self int mmap_sharing_flags;
  * BEGIN and END probes
  */
 BEGIN {
+    printf("{\"event\": \"host::info:\", \"host\": \"%s\", \"uname\":\"%s\", \"hostname\":\"%s\", \"network\":%s }\n", $1, $2, $3, $4);
 }
 
 END {
