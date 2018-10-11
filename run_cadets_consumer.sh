@@ -33,4 +33,4 @@ HOSTNAME=$(hostname)
 UNAME=$(uname -m -r -s -v)
 HOSTUUID=$(sysctl -n kern.hostuuid)
 
-ddtrace_consumer -d -b $BROKER -i $RAW_CADETS_TOPIC -o JSON_CADETS_TOPIC -s audit.d "$HOSTUUID" "$UNAME" "$HOSTNAME" "$(echo $NETWORK_DETAILS)"
+ddtrace_consumer -d -b $BROKER -i $RAW_CADETS_TOPIC -o $JSON_CADETS_TOPIC -s audit.d "$HOSTUUID" "$UNAME" "$HOSTNAME" "$(echo $NETWORK_DETAILS)"
