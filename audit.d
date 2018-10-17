@@ -148,8 +148,14 @@ self int mmap_sharing_flags;
 /*
  * BEGIN and END probes
  */
-BEGIN {
+
+int begun;
+
+audit:::commit
+/ !begun /
+{
     printf("{\"event\": \"host::info:\", \"host\": \"%s\", \"uname\":\"%s\", \"hostname\":\"%s\", \"network\":%s }\n", $1, $2, $3, $4);
+    begun = 1;
 }
 
 END {
