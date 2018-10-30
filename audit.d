@@ -368,7 +368,7 @@ audit::aue_null:commit
 
 #if AUDIT_PRINT_PATH
     printf("%s",
-	(ARG_IS_VALID(ARG_FD) && (probefunc=="aue_write" || probefunc == "aue_pwrite" || probefunc == "aue_writev" || probefunc == "aue_prwitev" || probefunc=="aue_read" || probefunc == "aue_pread" || probefunc == "aue_readv" || probefunc == "aue_preadv" || probefunc == "aue_mmap"))?strjoin(", \"fdpath\": \"", strjoin(fds[args[1]->ar_arg_fd].fi_pathname, "\"")):"");
+	(ARG_IS_VALID(ARG_FD) && (probefunc=="aue_write" || probefunc == "aue_pwrite" || probefunc == "aue_writev" || probefunc == "aue_pwritev" || probefunc=="aue_read" || probefunc == "aue_pread" || probefunc == "aue_readv" || probefunc == "aue_preadv" || probefunc == "aue_mmap"))?strjoin(", \"fdpath\": \"", strjoin(fds[args[1]->ar_arg_fd].fi_pathname, "\"")):"");
 #endif
 
 #if AUDIT_MPROTECT
