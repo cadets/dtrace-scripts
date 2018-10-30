@@ -18,6 +18,7 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 #define AUDIT_FAILED_CALLS 0
 #define AUDIT_ANON_MMAP 0
 #define AUDIT_SSH_MORE 0
+#define AUDIT_PRINT_PATH 1
 #define AUDIT_IPC_CALLS 1
 #define AUDIT_MPROTECT 1
 #define AUDIT_MMAP 1
@@ -363,6 +364,11 @@ audit::aue_null:commit
 	((probefunc=="aue_execve" || probefunc=="aue_exec" || probefunc=="aue_fexecve") && ((uintptr_t) curpsinfo) > 0) ? curpsinfo->pr_psargs : "");
     printf("%s",
 	((probefunc=="aue_execve" || probefunc=="aue_exec" || probefunc=="aue_fexecve") && ((uintptr_t) curpsinfo) > 0) ? "\"" : "");
+#endif
+
+#if AUDIT_PRINT_PATH
+    printf("%s",
+	(ARG_IS_VALID(ARG_FD) && (probefunc=="aue_write" || probefunc == "aue_pwrite" || probefunc == "aue_writev" || probefunc == "aue_prwitev" || probefunc=="aue_read" || probefunc == "aue_pread" || probefunc == "aue_readv" || probefunc == "aue_preadv" || probefunc == "aue_mmap"))?strjoin(", \"fdpath\": \"", strjoin(fds[args[1]->ar_arg_fd].fi_pathname, "\"")):"");
 #endif
 
 #if AUDIT_MPROTECT
