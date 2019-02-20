@@ -439,6 +439,7 @@ fbt::cc_conn_init:entry
     printf(", \"fport\": %d", ntohs(args[0]->t_inpcb->inp_inc.inc_ie.ie_fport));
     printf(", \"laddr\": \"%s\"", inet_ntop(af_inet, (void *) &args[0]->t_inpcb->inp_inc.inc_ie.ie_dependladdr.id46_addr.ia46_addr4));
     printf(", \"faddr\": \"%s\"", inet_ntop(af_inet, (void *) &args[0]->t_inpcb->inp_inc.inc_ie.ie_dependfaddr.id46_addr.ia46_addr4));
+    printf(", \"iss\": %d", args[0]->iss);
     printf("}\n");
 }
 
