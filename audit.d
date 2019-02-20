@@ -155,7 +155,8 @@ self int mmap_sharing_flags;
 
 BEGIN
 {
-    printf("{\"event\": \"host::info:\", \"host\": \"%s\", \"uname\":\"%s\", \"hostname\":\"%s\", \"network\":%s }\n", $1, $2, $3, $4);
+    printf("{\"event\": \"host::info:\", \"host\": \"%s\", \"uname\":\"%s\", \"hostname\":\"%s\", \"network\":%s ", $1, $2, $3, $4);
+    printf("}\n");
 }
 
 END {
