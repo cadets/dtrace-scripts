@@ -25,6 +25,8 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 #define FILTER_PYTHON 0
 #define FILTER_UID    1
 
+#define USER_PREDICATE (uid != 1003)
+
 /* FROM security/audit/audit_private.h
  *
  * Arguments in the audit record are initially not defined; flags are set to
@@ -238,7 +240,7 @@ audit::aue_null:commit
 && (execname != "python3.4")
 #endif
 #if FILTER_UID
-&& (uid != 1003)
+&& USER_PREDICATE
 #endif
 #if !AUDIT_FAILED_CALLS
     && ((args[1]->ar_retval >= 0) || (args[1]->ar_errno == -2 && ((probefunc == "aue_execve") || (probefunc == "aue_exec") || (probefunc == "aue_fexecve"))))
@@ -400,7 +402,7 @@ fbt::syncache_expand:entry
 && (execname != "python3.4")
 #endif
 #if FILTER_UID
-&& (uid != 1003)
+&& USER_PREDICATE
 #endif
 /
 {
@@ -422,7 +424,7 @@ fbt::cc_conn_init:entry
 && (execname != "python3.4")
 #endif
 #if FILTER_UID
-&& (uid != 1003)
+&& USER_PREDICATE
 #endif
 /
 {
@@ -445,7 +447,7 @@ udp:::send
 && (execname != "python3.4")
 #endif
 #if FILTER_UID
-&& (uid != 1003)
+&& USER_PREDICATE
 #endif
 /
 {
@@ -468,7 +470,7 @@ udp:::receive
 && (execname != "python3.4")
 #endif
 #if FILTER_UID
-&& (uid != 1003)
+&& USER_PREDICATE
 #endif
 /
 {
