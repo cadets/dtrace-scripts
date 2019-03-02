@@ -128,6 +128,8 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 #define MAP_SHARED      0x0001
 #define MAP_PRIVATE     0x0002
 
+#include "pam.inc"
+
 inline string mmap_prot_table[int32_t prot] =
     prot == PROT_NONE ?		"[\"PROT_NONE\"]" :
     prot == (PROT_READ) ? 	"[\"PROT_READ\"]" :
@@ -486,5 +488,25 @@ udp:::receive
     printf(", \"fport\": %d", args[4]->udp_sport);
     printf(", \"laddr\": \"%s\"", args[2]->ip_daddr);
     printf(", \"faddr\": \"%s\"", args[2]->ip_saddr);
+    printf("}\n");
+}
+
+/* Pam Auth Logging */
+sdt:::dt-probe
+/ args[0] == 1 /
+{
+	this->pam_h = (pam_handle_t*)copyin(args[1], sizeof(pam_handle_t));
+    printf("{\"event\": \"%s:%s:%s:\"", probeprov, probefunc, "pam_authenticate" );
+    printf(", \"host\": \"%s\"", $1);
+    printf(", \"time\": %d", walltimestamp);
+    printf(", \"pid\": %d", pid);
+    printf(", \"ppid\": %d",ppid);
+    printf(", \"tid\": %d", tid);
+    printf(", \"uid\": %d", uid);
+    printf(", \"cpu_id\": %d", curthread->td_ar->ar_subj_cpuid);
+    printf(", \"exec\": \"%s\"", curthread->td_ar->ar_subj_comm);
+    printf(", \"subjprocuuid\": \"%U\"", curthread->td_ar->ar_subj_proc_uuid);
+    printf(", \"subjthruuid\": \"%U\"", curthread->td_ar->ar_subj_thr_uuid);
+    printf(", \"username\": %s", copyinstr((uintptr_t)this->pam_h->item[PAM_USER]));
     printf("}\n");
 }
