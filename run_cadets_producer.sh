@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 RAW_CADETS_TOPIC=cadets-trace
+VERSION_FILE="/etc/tc-version"
 
 ETHERFACES=$(ifconfig -l ether)
 NETWORK_DETAILS="["
@@ -30,4 +31,4 @@ HOSTNAME=$(hostname)
 UNAME=$(uname -m -r -s -v)
 HOSTUUID=$(sysctl -n kern.hostuuid)
 
-ddtrace_producer -t $RAW_CADETS_TOPIC -s audit.d "$HOSTUUID" "$UNAME" "$HOSTNAME" "$(echo $NETWORK_DETAILS)"
+ddtrace_producer -t $RAW_CADETS_TOPIC -s audit.d "$HOSTUUID" "$UNAME" "$HOSTNAME" "$(echo $NETWORK_DETAILS)" "$(cat $VERSION_FILE)"

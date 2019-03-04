@@ -28,4 +28,4 @@ HOSTNAME=$(hostname)
 UNAME=$(uname -m -r -s -v)
 HOSTUUID=$(sysctl -n kern.hostuuid)
 
-./audit.d "$HOSTUUID" "$UNAME" "$HOSTNAME" "$(echo $NETWORK_DETAILS)"
+./audit.d "$HOSTUUID" "$UNAME" "$HOSTNAME" "$(echo $NETWORK_DETAILS)" "dtrace, fake date, fake_version; "

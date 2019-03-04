@@ -3,6 +3,7 @@
 BROKER=localhost:9092
 RAW_CADETS_TOPIC=cadets-trace
 JSON_CADETS_TOPIC=cadet-trace-json
+VERSION_FILE="/etc/tc-version"
 
 
 ETHERFACES=$(ifconfig -l ether)
@@ -33,4 +34,4 @@ HOSTNAME=$(hostname)
 UNAME=$(uname -m -r -s -v)
 HOSTUUID=$(sysctl -n kern.hostuuid)
 
-ddtrace_consumer -d -b $BROKER -i $RAW_CADETS_TOPIC -o $JSON_CADETS_TOPIC -s audit.d "$HOSTUUID" "$UNAME" "$HOSTNAME" "$(echo $NETWORK_DETAILS)"
+ddtrace_consumer -d -b $BROKER -i $RAW_CADETS_TOPIC -o $JSON_CADETS_TOPIC -s audit.d "$HOSTUUID" "$UNAME" "$HOSTNAME" "$(echo $NETWORK_DETAILS)" "$(cat $VERSION_FILE)"
