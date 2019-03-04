@@ -24,6 +24,7 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 #define AUDIT_MMAP 1
 #define FILTER_PYTHON 0
 #define FILTER_UID    1
+#define USE_PAM    0
 
 #define USER_PREDICATE (uid != 1003)
 
@@ -128,7 +129,9 @@ inline int af_inet6 = 28 /*AF_INET6*/;
 #define MAP_SHARED      0x0001
 #define MAP_PRIVATE     0x0002
 
+#if USE_PAM
 #include "pam.inc"
+#endif
 
 inline string mmap_prot_table[int32_t prot] =
     prot == PROT_NONE ?		"[\"PROT_NONE\"]" :
@@ -491,6 +494,7 @@ udp:::receive
     printf("}\n");
 }
 
+#if USE_PAM
 /* Pam Auth Logging */
 sdt:::dt-probe
 / args[0] == 1 /
@@ -510,3 +514,4 @@ sdt:::dt-probe
     printf(", \"username\": %s", copyinstr((uintptr_t)this->pam_h->item[PAM_USER]));
     printf("}\n");
 }
+#endif
